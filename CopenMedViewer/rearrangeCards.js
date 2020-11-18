@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    var count = 1;
     var list = $(".container").map(function(){
         var childs = $(this).children("div").toArray();
         var ids = [];
@@ -8,7 +7,6 @@ $(document).ready(function() {
                 ids.push("#" + childs[i].id);
         }
         $(this).children("div").map(function() {
-            count++;
             $(this).sortable({
                 placeholder: 'placeholder',
                 revert: 150,
@@ -22,11 +20,11 @@ $(document).ready(function() {
                 change: function(event, ui) {
                     ui.placeholder.stop().height(0).animate({
                         height: ui.item.outerHeight() + 15
-                    }, 300);
+                    }, 100);
                     placeholderAnimatorHeight = parseInt($(".slide-placeholder-animator").attr("data-height"));
                     $(".slide-placeholder-animator").stop().height(placeholderAnimatorHeight + 15).animate({
                         height: 0
-                    }, 300, function() {
+                    }, 100, function() {
                         $(this).remove();
                         placeholderHeight = ui.item.outerHeight();
                         $('<div class="slide-placeholder-animator" data-height="' + placeholderHeight + '"></div>').insertAfter(ui.placeholder);

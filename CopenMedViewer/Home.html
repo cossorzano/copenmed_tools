@@ -14,6 +14,7 @@
         <script type="text/javascript" src='addCard.js'></script>
         <script type="text/javascript" src='popUp.js'></script>
         <script type="text/javascript" src='rearrangeCards.js'></script>
+        <script type="text/javascript" src='userSelection.js'></script>
     </head>
 
     <header>
@@ -57,16 +58,27 @@
                     </div>
                 </div>
                 <div class='container' id='symptoms'>
-                    <div class="user_selection" id="symptoms_user">
-                        <div class="card" id="Tos">Tos</div>
-                        <div class="card" id="Fiebre">Fiebre</div>
-                        <div class="card" id="Dolor">Dolor</div>
-                    </div>
+                    <div class="user_selection" id="symptoms_user"></div>
                     <div class="separator"><div class="line"></div></div>
                     <div class="copenMed_container" id="symptoms_copenMed">
-                        <div class="card" id="Tos">Tos</div>
-                        <div class="card" id="Fiebre">Fiebre</div>
-                        <div class="card" id="Dolor">Dolor</div>
+                        <div class="card" id="Tos">
+                            Tos
+                            <div class="selection">
+                                <span class="material-icons check">done</span>
+                            </div>
+                        </div>
+                        <div class="card" id="Fiebre">
+                            Fiebre
+                            <div class="selection">
+                                <span class="material-icons check">done</span>
+                            </div>
+                        </div>
+                        <div class="card" id="Dolor">
+                            Dolor
+                            <div class="selection">
+                                <span class="material-icons check">done</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -80,27 +92,30 @@
                     </div>
                 </div>
                 <div class='container' id='Illnesses'>
-                    <div class="user_selection" id="illnesses_user">
-                        <div class="card" id="Gripe">Gripe</div>
-                        <div class="card" id="Catarro">Catarro</div>
-                        <div class="card" id="Any">Any</div>
-                    </div>
+                    <div class="user_selection" id="illnesses_user"></div>
                     <div class="separator"><div class="line"></div></div>
                     <div class="copenMed_container" id="illnesses_copenMed">
-                        <div class="card" id="Gripe">Gripe</div>
-                        <div class="card" id="Catarro">Catarro</div>
-                        <div class="card" id="Any">Any</div>
-                        <div class="card" id="Any">Any</div>
-                        <div class="card" id="Any">Any</div>
-                        <div class="card" id="Any">Any</div>
-                        <div class="card" id="Any">Any</div>
-                        <div class="card" id="Any">Any</div>
-                        <div class="card" id="Any">Any</div>
+                        <div class="card" id="Gripe">
+                            Gripe
+                            <div class="selection">
+                                <span class="material-icons check">done</span>
+                            </div>
+                        </div>
+                        <div class="card" id="Catarro">
+                            Catarro
+                            <div class="selection">
+                                <span class="material-icons check">done</span>
+                            </div>
+                        </div>
+                        <div class="card" id="Any">
+                            Any
+                            <div class="selection">
+                                <span class="material-icons check">done</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </body>
-
-
 </html>

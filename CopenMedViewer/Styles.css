@@ -218,14 +218,23 @@ header:hover nav div.img {
     margin: 0 auto;
 }
 
-.placeholder:after {
-    content: "";
+.selection {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 15px;
-    background-color: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    width: 85%;
+    height: 45px;
+}
+
+.check {
+    font-size: 20px; 
+    color: #292929;
+    transition: 0.5s;
+}
+
+.check:hover{
+    color: #3700B3;
 }
 /* ############# */
 
