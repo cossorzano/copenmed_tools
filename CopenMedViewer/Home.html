@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CopenMed Visor</title>
+        <link rel="stylesheet" href="Styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">
+        <script type="text/javascript" src='moveBody.js'></script>
+        <script type="text/javascript" src='addCard.js'></script>
+        <script type="text/javascript" src='popUp.js'></script>
+        <script type="text/javascript" src='rearrangeCards.js'></script>
+    </head>
+
+    <header>
+        <nav>
+            <div class="icon">
+                <span class="material-icons" style="font-size: 40px;">settings</span>
+            </div>
+            <ul>
+                <li><a href="#">About CopenMed</a></li>
+                <li><a href="#">Database</a></li>
+                <li><a href="#">Contact us</a></li>
+            </ul>
+            <div class="img">
+                <img src="Images/ceo_logo.png" width="100px">
+            </div>
+        </nav>
+    </header>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div id='searchCards'><input type="text" name="search" autocomplete="off" placeholder="Search in CopenMed" id='divInput'></div>
+            <div style="flex-grow: 1; margin-right: 50px;"><span class="close" style="font-size: 40px;">&times;</span></div>
+            <div class="break"></div>
+            <div style="text-align: center; flex-grow: 10; display: block;">
+                <button id="addLabel">
+                    <span class="material-icons" style="font-size: 40px; color: #aaa;">add</span>
+                </button>
+            </div>
+        </div> 
+    </div>
+
+    <body>
+        <div style="display: flex; padding: 0; width: 100%; flex-wrap: wrap; justify-content: flex-start; gap: 50px;">
+            <div>
+                <div class="container_label">
+                    <div style="flex-grow: 2;">Symptoms</div>
+                    <div style="flex-grow: 1; display: table-cell; vertical-align: middle"">
+                        <button class="addCard">
+                            <span class="material-icons" style="font-size: 30px; color: white; margin-top: 2px;">search</span>
+                        </button> 
+                    </div>
+                </div>
+                <div class='container' id='symptoms'>
+                    <div class="user_selection" id="symptoms_user">
+                        <div class="card" id="Tos">Tos</div>
+                        <div class="card" id="Fiebre">Fiebre</div>
+                        <div class="card" id="Dolor">Dolor</div>
+                    </div>
+                    <div class="separator"><div class="line"></div></div>
+                    <div class="copenMed_container" id="symptoms_copenMed">
+                        <div class="card" id="Tos">Tos</div>
+                        <div class="card" id="Fiebre">Fiebre</div>
+                        <div class="card" id="Dolor">Dolor</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="container_label">
+                    <div style="flex-grow: 2;">Illnesses</div>
+                    <div style="flex-grow: 1; display: table-cell; vertical-align: middle">
+                        <button class="addCard">
+                            <span class="material-icons" style="font-size: 30px; color: white; margin-top: 2px;">search</span>
+                        </button> 
+                    </div>
+                </div>
+                <div class='container' id='Illnesses'>
+                    <div class="user_selection" id="illnesses_user">
+                        <div class="card" id="Gripe">Gripe</div>
+                        <div class="card" id="Catarro">Catarro</div>
+                        <div class="card" id="Any">Any</div>
+                    </div>
+                    <div class="separator"><div class="line"></div></div>
+                    <div class="copenMed_container" id="illnesses_copenMed">
+                        <div class="card" id="Gripe">Gripe</div>
+                        <div class="card" id="Catarro">Catarro</div>
+                        <div class="card" id="Any">Any</div>
+                        <div class="card" id="Any">Any</div>
+                        <div class="card" id="Any">Any</div>
+                        <div class="card" id="Any">Any</div>
+                        <div class="card" id="Any">Any</div>
+                        <div class="card" id="Any">Any</div>
+                        <div class="card" id="Any">Any</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+
+</html>

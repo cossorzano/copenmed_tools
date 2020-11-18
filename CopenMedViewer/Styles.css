@@ -1,0 +1,419 @@
+/* Remove margins from webpage */
+body {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    padding-left: 200px;
+    background-color: #121212;
+    overflow-y: hidden;
+}
+
+/* Webpage Options */
+html {
+    scroll-behavior: smooth;
+    font-family: Roboto;
+}
+
+/* Lateral Menu */
+header {
+    background-color: #292929;
+    color: white;
+    position: absolute;
+    /* position: fixed; */
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;    
+    height:100%;
+    width: 200px;
+    left: -100px;
+    transition: 0.5s ease-in-out;
+}
+
+header nav {
+    width: 100%;
+}
+
+header nav div.icon {
+    width: 100%;
+    height: 40px;
+    text-align: center;
+    margin-top: 20px;
+    padding-bottom: 60px;
+    margin-left: 50px;
+    transition: 0.5s ease-in-out;
+}
+
+header nav ul {
+    opacity: 0;
+    text-decoration: none;
+    list-style: none;
+    text-align: center;
+    padding: 0;
+    transition: 0.5s ease-in-out;
+}
+
+header nav li { 
+    padding-top: 30px;
+    padding-bottom: 30px;
+    transition: 0.5s;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+header nav ul li a:active {
+    color: white;
+}
+
+header nav ul li a:visited {
+    color: white;
+}
+
+header nav ul li a:after {
+    color: white;
+}
+
+header nav ul li:hover {
+    background-color: rgb(78, 78, 78);
+    -moz-box-shadow:    inset 0 0 5px black;
+    -webkit-box-shadow: inset 0 0 5px black;
+    box-shadow:         inset 0 0 5px black; 
+}
+
+header nav div.img {
+    position: absolute;
+    display: flex;
+    opacity: 0;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 42.5%;
+    transition: 0.5s ease-in-out;
+}
+
+header:hover {
+    transform: translateX(100px);
+}
+
+header:hover nav div.icon {
+    margin-left: 0;
+}
+
+header:hover nav ul {
+    opacity: 100%;
+}
+
+header:hover nav div.img {
+    opacity: 100%;
+}
+
+/* Main Content */
+
+/* Card Container */
+.container {
+    position: relative;
+    width: 300px;
+    background-color: #474747;
+    height: 84vh;
+    border-radius: 10px;
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+    touch-action: none;
+    padding-top: 15px;
+    border-top: 5px solid #3700B3;
+
+}
+.container_label {
+    position: relative;
+    width: 300px;
+    background-color: #474747;
+    height: 5vh;
+    border-radius: 10px;
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+    touch-action: none;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-bottom: 5px solid #3700B3;
+    display: flex;
+}
+
+.container_label div {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+}
+
+.user_selection {
+    height: 47%;
+    overflow-y: auto;
+    width: 96%;
+    margin: 0 auto;
+    
+}
+
+.copenMed_container {
+    height: 47%;
+    overflow-y: auto;
+    width: 96%;
+    margin: 0 auto;
+}
+
+.separator {
+    display: flex;
+    align-items: middle;
+    justify-content: center;
+    height: 1%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.copenMed_container::-webkit-scrollbar, .user_selection::-webkit-scrollbar{
+    width: 0.5em;
+}
+ 
+.copenMed_container::-webkit-scrollbar-track, .user_selection::-webkit-scrollbar-track{
+    -webkit-box-shadow: inset 0 0 6px black;
+    border-radius: 10px;
+    margin-right: 20px;
+    background-color: none;
+}
+ 
+.copenMed_container::-webkit-scrollbar-thumb, .user_selection::-webkit-scrollbar-thumb{
+  background-color: #3700B3;
+  border-radius: 10px;
+}
+/* ############# */
+
+/* Card style */
+.card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    height: 50px;
+    text-align: center;
+    margin: 10px;
+    border-radius: 5px;
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+    touch-action: none;
+    user-select: none;
+}
+
+.placeholder {
+    /* background-color: #3700B3; */
+    position: relative;
+    width: 95%;
+    border-radius: 5px;
+    margin: 0 auto;
+}
+
+.placeholder:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 15px;
+    background-color: none;
+}
+/* ############# */
+
+/* Add Button */
+.addCard {
+    position: relative;
+    bottom: 0;
+    right: 0;
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+    padding-right: 1px;
+    padding-left: 1px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    transition: 0.5s;
+    width: 100%;
+    height: 100%;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 8px;
+}
+
+.addCard:hover {
+    background-color: #3700B3;
+}
+
+.addCard:focus {
+    outline: none;
+}
+/* ############# */
+
+/* Pop Up Window */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+  
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    width: 80%;
+    height: 120px;
+    border-radius: 5px;
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+  
+.close:hover, .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#addLabel {
+    position: relative;
+    bottom: 0;
+    right: 0;
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+    padding-right: 1px;
+    padding-left: 1px;
+    border-radius: 50%;
+    transition: 0.5s;
+}
+
+#addLabel:hover {
+    -moz-box-shadow:    inset 0 0 5px black;
+    -webkit-box-shadow: inset 0 0 5px black;
+    box-shadow:         inset 0 0 5px black;  
+}
+
+#addLabel:focus {
+    outline: none;
+}
+/* ############# */
+
+/* Search Place holders */
+#searchCards {
+    border-radius: 5px;
+    height: 50px;
+    text-align: center;
+    border: none;
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+    display: block;
+    margin : 0 auto;
+    flex-grow: 15;
+}
+
+#divInput {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+}
+
+#divInput:focus {
+    outline: none;
+}
+/* ############# */
+
+/* ***** Media Queries ***** */
+
+/* Lateral Menu */
+@media screen and (max-width:950px ) {
+    header {
+        background-color: #464646;
+        color: white;
+        position: fixed;
+        -moz-box-shadow:    1px 4px 15px -4px black;
+        -webkit-box-shadow: 1px 4px 15px -4px black;
+        box-shadow:         1px 4px 15px -4px black;    
+        height:400px;
+        width: 100%;
+        left: 0;
+        bottom: -320px;
+        transition: 0.5s ease-in-out;
+        z-index: 2;
+    }
+
+    header nav div.icon {
+        width: 100%;
+        height: 40px;
+        text-align: center;
+        margin-top: 20px;
+        padding-bottom: 20px;
+        margin-left: 0;
+        transition: 0.5s ease-in-out;
+    }
+
+    header:hover {
+        transform: translateX(0);
+        transform: translateY(-320px);
+    }
+
+    header nav li { 
+        padding-top: 15px;
+        padding-bottom: 15px;
+        transition: 0.5s;
+    }
+
+    header nav div.img {
+        position: absolute;
+        display: flex;
+        opacity: 0;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 35%;
+        transition: 0.5s ease-in-out;
+    }
+}
+
+
+/* Utils */
+.break {
+    flex-basis: 100%;
+    height: 0;
+}
+
+.line{
+    width: 95%;
+    height: 0px;
+    border-bottom: 5px solid #3700B3;
+    position: absolute;
+    border-radius: 100px;
+}
+/* ############# */
