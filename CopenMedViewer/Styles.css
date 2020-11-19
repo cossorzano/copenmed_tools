@@ -1,6 +1,6 @@
 /* Remove margins from webpage */
 body {
-    width: 100%;
+    width: auto;
     max-width: 100%;
     padding: 0;
     margin: 0;
@@ -271,7 +271,6 @@ header:hover nav div.img {
     display: none;
     position: fixed;
     z-index: 1;
-    padding-top: 100px;
     left: 0;
     top: 0;
     width: 100%;
@@ -356,6 +355,16 @@ header:hover nav div.img {
 
 #divInput:focus {
     outline: none;
+}
+
+.knowMore {
+    color: #292929;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.knowMore:hover {
+    color: #3700B3;
 }
 /* ############# */
 
