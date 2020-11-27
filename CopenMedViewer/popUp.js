@@ -1,5 +1,10 @@
+var cardContainer;
+var selectedCard;
+var container_new;
+
 $(document).ready(function(){
     $(".addCard").click(function() {
+        cardContainer = $(this).parents("#page-cell");
         $(this).parents("#page-cell").find(".copenMed_container > div").each(function() {
             var str = $(this).text().replace("done", "");
             div = document.createElement('div');
@@ -24,18 +29,57 @@ $(document).ready(function(){
     $(window).click(function(event) {
         if (event.target == $('#modal-search')[0]) {
             $('#modal-search').css("display", "none");
-            // $(".container-options").find("#selected").each(function(){
-
-            // });
             $(".container-options").empty();
         }
     });
 });
 
-$(document).ready(function(){
-    $(".close").click(function() {
-        $("#modal-search").css("display", "none");
+$(document).ready(function() {
+    $("#addLabel").on("click", function() {
+        $(".container-options").children("#selected").each(function(){
+            selectedCard = this;
+            $(cardContainer).find(".copenMed_container > div").each(function(){
+                var str = $(this).text().replace("done", "");
+                if (str == $(selectedCard).text()) {
+                    container_new = $(cardContainer).find(".user_selection");
+                    $(this).find(".check").css({color: "#3700B3"});
+                    $(this).detach().appendTo(container_new)
+                }
+            });
+        });
+        $(".container-options").children("#not-selected").each(function(){
+            selectedCard = this;
+            $(cardContainer).find(".user_selection > div").each(function(){
+                var str = $(this).text().replace("done", "");
+                if (str == $(selectedCard).text()) {
+                    container_new = $(cardContainer).find(".copenMed_container");
+                    $(this).find(".check").css({color: "#292929"});
+                    $(this).detach().appendTo(container_new)
+                }
+            });
+        });
+        $('#modal-search').css("display", "none");
         $(".container-options").empty();
     });
 });
+
+$(document).ready(function(){
+    $(".container-options").on('click', '.card', function() {
+        if (this.id == "selected") {
+            $(this).css({"border": "none"});
+            $(this).attr({"id": "not-selected"});
+        }
+        else if ((this.id == "not-selected")) {
+            $(this).css({"border": "2px solid #3700B3"});
+            $(this).attr({"id": "selected"});
+        }
+    });
+});
+
+// $(document).ready(function(){
+//     $(".close").click(function() {
+//         $("#modal-search").css("display", "none");
+//         $(".container-options").empty();
+//     });
+// });
 

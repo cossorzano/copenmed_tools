@@ -195,6 +195,7 @@ header:hover nav div.img {
 
 /* Card style */
 .card {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -280,6 +281,7 @@ header:hover nav div.img {
 }
   
 .modal-content {
+    position: relative;
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
@@ -378,12 +380,30 @@ header:hover nav div.img {
 }
 
 .container-options {
-    width: auto;
-    height: 200px;
+    width: 80%;
+    height: 50%;
     overflow: auto;
-    margin-top: 40px;
+    position: absolute;
+    margin-top: 60px;
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: repeat(auto-fit, minmax(100px , 0.1fr));
+    grid-gap:10px;
+}
+
+.container-options::-webkit-scrollbar{
+    width: 0.5em;
+}
+ 
+.container-options::-webkit-scrollbar-track{
+    -webkit-box-shadow: inset 0 0 6px black;
+    border-radius: 10px;
+    margin-right: 20px;
+    background-color: none;
+}
+ 
+.container-options::-webkit-scrollbar-thumb{
+  background-color: #3700B3;
+  border-radius: 10px;
 }
 /* ############# */
 
