@@ -237,6 +237,16 @@ header:hover nav div.img {
 .check:hover{
     color: #3700B3;
 }
+
+.cross {
+    font-size: 20px; 
+    color: #292929;
+    transition: 0.5s;
+}
+
+.cross:hover{
+    color: red;
+}
 /* ############# */
 
 /* Add Button */

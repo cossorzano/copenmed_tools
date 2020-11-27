@@ -33,9 +33,12 @@ $(document).ready(function() {
                 },
                 stop: function(e, ui) {
                     // var check = $(this).data().uiSortable.currentItem.children("div").children("span");
-                    var check = $(ui.item).children("div").children("span");
-                    if (($(ui.item).parents(".copenMed_container").length))
+                    var check = $(ui.item).children("div").children(".check");
+                    var cross = $(ui.item).children("div").children(".cross");
+                    if (($(ui.item).parents(".copenMed_container").length)) {
                         $(check[0]).animate({color: "#292929"}, 50);
+                        $(cross[0]).animate({color: "#292929"}, 50);
+                    }
                     else
                         $(check[0]).animate({color: "#3700B3"}, 50);
                     $(".slide-placeholder-animator").remove(); 
