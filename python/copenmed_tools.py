@@ -38,17 +38,17 @@ def bidirectional_relations(edge_type_dict):
 def load_database(fn):
     infile = open(fn,'rb')
     (lang_dict, lang_dict_info, entity_type_dict, entity_type_dict_info, 
-     entity_dict, entity_dict_info, edge_type_dict, edge_type_dict_info,
-     list_bidirectional_relations,
-     edge_dict, edge_dict_info, details_dict, details_dict_info, 
+     entity_dict, entity_dict_info,
+     edge_type_dict, edge_type_dict_info, list_bidirectional_relations,
+     edge_dict, edge_dict_info, details_dict, details_dict_info,
      resources_dict, resources_dict_info) = \
        pickle.load(infile)
     infile.close()
-    return (lang_dict, lang_dict_info, entity_type_dict, entity_type_dict_info,
-           entity_dict, entity_dict_info, edge_type_dict, edge_type_dict_info,
-           list_bidirectional_relations,
-           edge_dict, edge_dict_info, details_dict, details_dict_info,
-           resources_dict, resources_dict_info)
+    return (lang_dict, lang_dict_info, entity_type_dict, entity_type_dict_info, 
+            entity_dict, entity_dict_info,
+            edge_type_dict, edge_type_dict_info, list_bidirectional_relations,
+            edge_dict, edge_dict_info, details_dict, details_dict_info,
+            resources_dict, resources_dict_info)
 
 def separate_entities_by_type(entity_type_dict, entity_dict):
     entities = {}
@@ -114,7 +114,7 @@ def add_directional_edges(edge_dict, list_bidirectional_relations):
             if idEntity1!=idEntity2 and \
                not (idEntity2,idEntity1,edgeType) in edges_present:
                 toAdd.append([idEntity2,idEntity1,edgeType,edge[3],
-                                      edge[4],edge[5],edge[6]])
+                                      edge[4],edge[5]])
 
     nextKey = np.max([key for key in edge_dict])+1
     N=0
