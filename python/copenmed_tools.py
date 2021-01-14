@@ -7,7 +7,7 @@ import sys
 
 def make_dict(sheetName, varName, multiple=False):
     if not os.path.exists(fnExcel):
-        raise "Cannot find %s"%fnExcel
+        raise Exception("Cannot find %s"%fnExcel)
     out1 = pd.read_excel(fnExcel, sheet_name=sheetName, engine="openpyxl")
     df = out1.dropna(axis=1, how="all")
     if multiple:
@@ -30,7 +30,8 @@ def bidirectional_relations(edge_type_dict):
                         " is similar to " in edge_name or \
                         " is also " in edge_name or \
                         " is seen with " in edge_name or \
-                        " can be seen also with " in edge_name
+                        " can be seen also with " in edge_name or \
+                        "Substance is Treatment" in edge_name
         if bidirectional:
             list_bidirectional_relations.append(idEdge)
     return list_bidirectional_relations
@@ -269,8 +270,17 @@ class Graph():
         return self.node_max
     
     def getNode(self, idEntity):
-        return self.graph[idEntity]
+        if idEntity in self.graph:
+            return self.graph[idEntity]
+        else:
+            return None
 
+class COpenMedReasoner():
+    def newFacts(idEntities):
+        """ idEntities is a string "id1 id2 id3".
+            ids may be negative, and then present is not needed
+        """
+        pass
 
 if __name__=="__main__":
     if len(sys.argv) <= 1:
