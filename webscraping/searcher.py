@@ -11,6 +11,7 @@
 import argparse
 import os
 from downloader import download_text
+from check_resource import check_resource_retrieved_before
 #import numpy as np
 
 try: 
@@ -24,8 +25,9 @@ n = 10;
 url = ''
 searcher = 'www.google.com'
 out_path = os.getcwd()
+word = ''
 
-def main(word, url, n, searcher, out_path):
+def google_search(word, url, n, searcher, out_path):
 
     """
     query : query string that we want to search for.
@@ -42,129 +44,134 @@ def main(word, url, n, searcher, out_path):
 
     #We have two different functionalities: The user enters a word for searching or a specific url
     if len(url) != 0:
-        n = 1
-        query = url
+        # User has entered a specific URL
+        print(check_resource_retrieved_before(url, out_path))
+        if (check_resource_retrieved_before(url, out_path)):
+            print("This URL already was searched before. Thus, we will not search again for the text")
+            
+        else:
+            urls2doc(url, word.replace("_", " "), out_path)
+            download_text(out_path)
+
     else: 
         query = word.replace("_", " ")
         
-    print(query)
-    print(out_path)
-    for i in search(query, tld="es", num=n, start=0, stop=None, pause=2):
-        if (check_resource_retrieved_before(i, out_path)):
-            print("we have encountered a match")
-            if len(url) != 0:
-                break
+        print(query)
+        print(out_path)
+        
+        list_searches = search_only(query, n, out_path)
+        if len(list_of_urls) != 0:
+            for url in list_of_urls:
+                urls2doc(url, query, out_path)
+            download_text(out_path)
         else:
-            list_searches.append(i)
-            counter = counter + 1
-            print(counter)
-        if (counter == n):
-           break
-        print(i)
-        print(list_searches)
-    
-    if len(list_searches) != 0:
-        download_text(list_searches, word, out_path)
-    else:
-        print("Nothing was retrieved")
-
- 
-def check_resource_retrieved_before(url, dir_path):
- 
-    dir_path += "/dir"
-    entities_list = os.listdir(dir_path)
-    
-    print(entities_list)
-    
-    if len(entities_list) != 0: 
-        # Some resources already exist we must check the url does not exist in
-        # an url.txt
-        for f in entities_list:
-            resources_list = os.listdir(dir_path + "/" + f)
-            for r in resources_list:
-                pathdoc_url = dir_path + "/" + f + "/" + r + "/url.txt"
-                doc = open(pathdoc_url, "r")
-                print(doc.read())
-                
-                if(doc.read() == url):
-                    return True
-    else:
-        return False
- 
+            print("Nothing was retrieved")
 
 
+def search_only(query, n, out_path):
+    list_searches = []
+    
+    for i in search(query, tld="es", num=n, start=0, stop=None, pause=2):
+            if (check_resource_retrieved_before(i, out_path)):
+                print("we have encountered a match")
+            else:
+                list_searches.append(i)
+                counter = counter + 1
+                #print(counter)
+            if (counter == n):
+               break
+    return list_searches
+    
+        
+
+ 
+def urls2doc(url, word, dir_path):
+
+    dir_path += "/url_list.txt"
+        
+    doc = open(dir_path, "a")
+    #print(doc.read())
+
+    doc.write(url + " " + word + "\n")
+    doc.close()
+                        
+
+if __name__ == "__main__":
+    
 ######################
 # PROGRAMA PRINCIPAL #
 ######################
 
-# Argparse - Insert parameters from command line
-parser = argparse.ArgumentParser(description="Search by terms")
+    # Argparse - Insert parameters from command line
+    parser = argparse.ArgumentParser(description="Search by terms")
 
-parser.add_argument('-w',
+    parser.add_argument('-w',
                     "--word",
                     type=str,
                     help="Word to search")
                     
-parser.add_argument('-u',
+    parser.add_argument('-u',
                     "--url",
                     type=str,
                     help="Specific url to search") 
                                        
-parser.add_argument('-n',
+    parser.add_argument('-n',
                     "--n",
                     type=int,
                     help="Number of pages to store")
 
-parser.add_argument('-s',
+    parser.add_argument('-s',
                     "--search",
                     type=str,
                     help="Search engine to use.")
 
-parser.add_argument('-o',
+    parser.add_argument('-o',
                     "--output",
                     type=str,
                     help="Output path where files are going to be stored")
 
-# Parseo de los argumentos
-arguments = vars(parser.parse_args())
+    # Parseo de los argumentos
+    arguments = vars(parser.parse_args())
 
-if arguments['word']:
-    word = arguments['word']
-else:
-    print("ERROR: Please enter valid words")
-    exit()
+    if arguments['word']:
+        if isinstance(arguments['word'], str):
+            word = arguments['word']
+        else:
+            print("ERROR: Please enter valid words")
+            exit()
     
-if arguments['url']:
-    if isinstance(arguments['url'], str):
-        url = arguments['url']
-    else:
-        print("ERROR: Please enter a valid search engine.")
-        exit()
+    if arguments['url']:
+        if isinstance(arguments['url'], str):
+            url = arguments['url']
+        else:
+            print("ERROR: Please enter a valid search engine.")
+            exit()
         
-if arguments['n']:
-    if arguments['n'] > 0:
-        n = arguments['n']
-    else:
-        print("ERROR: N must be bigger than 0")
-        exit()
+    if arguments['n']:
+        if isinstance(arguments['n'], int):
+            if arguments['n'] > 0:
+                n = arguments['n']
+            else:
+                print("ERROR: N must be bigger than 0")
+                exit()
         
-if arguments['search']:
-    if isinstance(arguments['search'], str):
-        searcher = arguments['search']
-    else:
-        print("ERROR: Please enter a valid search engine.")
-        exit()
+    if arguments['search']:
+        if isinstance(arguments['search'], str):
+            searcher = arguments['search']
+        else:
+            print("ERROR: Please enter a valid search engine.")
+            exit()
         
-if arguments['output']:
-    if isinstance(arguments['output'], str):
-        if(os.path.isdir()):
-            output_type = arguments['output']
+    if arguments['output']:
+        if isinstance(arguments['output'], str):
+            if(os.path.isdir()):
+                output_type = arguments['output']
+            else:
+                print("ERROR: Please enter a valid path.")
+                exit()
         else:
             print("ERROR: Please enter a valid path.")
             exit()
-    else:
-        print("ERROR: Please enter a valid path.")
-        exit()
 
-main(word, url, n, searcher, out_path)
+    google_search(word, url, n, searcher, out_path)
 
