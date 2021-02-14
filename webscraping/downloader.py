@@ -17,15 +17,17 @@ import os
 import numpy as np
 import pandas as pd
 import unicodedata
-
+import time
+import random
 from bs4 import BeautifulSoup
-
+from itertools import cycle
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from check_resource import check_resource_retrieved_before
 from preprocessing import preprocess_text
+from proxies import get_proxies
 
 ##########################
 #    Static variables    #
@@ -59,7 +61,17 @@ def download_text(path):
     indexes: Positions of the numpy array where cosine simlarity surpass a threshold
     clean_text: Plain text with the relevant text
     """    
-    
+    user_agent_list = [
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+    ]
+    #proxies = ['121.129.127.209:80', '124.41.215.238:45169', '185.93.3.123:8080', '194.182.64.67:3128', '106.0.38.174:8080', '163.172.175.210:3128', '13.92.196.150:8080']
+    proxies = get_proxies()
+    proxy_pool = cycle(proxies)
+
     # First step is to load the file with the urls and the word
     doc_path = path + "/url_list.txt"
     url_doc = open(doc_path, "r")
@@ -74,47 +86,61 @@ def download_text(path):
             print(url)
             print(word)
         else:
-            try:
-                page = requests.get(url)
-                data = page.content
-                soup = BeautifulSoup(data, 'html.parser')
-                texts = soup.find_all(text=True)
-                clean_plain_text = ''
-                clean_text = ''
+            for i in range(1,11):
+                #Get a proxy from the pool
+                proxy = next(proxy_pool)
+                print("Request #%d"%i)
+                
+                try:
+                    time.sleep(30)
+                    response = requests.get(url,proxies={"http": proxy, "https": proxy})
+                    print(response.json())
+                   
+                
+                    data = page.content
+                    soup = BeautifulSoup(data, 'html.parser')
+                    texts = soup.find_all(text=True)
+                    clean_plain_text = ''
+                    clean_text = ''
 
-                for t in texts:
-                    if t.parent.name not in blacklist:
-                        clean_plain_text += '{} '.format(t) #We have obtained the html (except the blacklist) as plain text
+                    for t in texts:
+                        if t.parent.name not in blacklist:
+                            clean_plain_text += '{} '.format(t) #We have obtained the html (except the blacklist) as plain text
         
-                lines = clean_plain_text.split('\n \n')
+                    lines = clean_plain_text.split('\n \n')
         
-                for line in lines[:]:
-                    #Sería mejor almacenarlo en otro objeto porque es raro modificar el mismo objeto sobre el cual se itera
-                    if len(line.strip()) < 3 or '^' in line or len(line.split()) < 2:
-                        lines.remove(line)
+                    for line in lines[:]:
+                        #Sería mejor almacenarlo en otro objeto porque es raro modificar el mismo objeto sobre el cual se itera
+                        if len(line.strip()) < 3 or '^' in line or len(line.split()) < 2:
+                            lines.remove(line)
                 
-                values = apply_tfidf(lines, word)
-                print(type(values))
-                if max(values) < max_value:
-                    #If the max value of cosine similarity is lower than the max_value acceptable
-                    # we may be working with text in another language, thus, we dont want this text
-                    if max(values) == 0:
-                        print("No matching was found")
-                    else:    
-                        print("Cosine similarity matrix values may be too small to be valuable text.")
-                        print("Proceeding to ignore this document...\n")
-                else:
-                    indexes = np.where(values > threshold*max(values))
-                    print("Threshold employed for this document is " + str(threshold*max(values)))
+                    values = apply_tfidf(lines, word)
+                    print(type(values))
+                    if max(values) < max_value:
+                        #If the max value of cosine similarity is lower than the max_value acceptable
+                        # we may be working with text in another language, thus, we dont want this text
+                        if max(values) == 0:
+                            print("No matching was found")
+                        else:    
+                            print("Cosine similarity matrix values may be too small to be valuable text.")
+                            print("Proceeding to ignore this document...\n")
+                    else:
+                        indexes = np.where(values > threshold*max(values))
+                        print("Threshold employed for this document is " + str(threshold*max(values)))
         
-                    for i in range(len(indexes[0])):
-                        text = remove_punctuation(lines[indexes[0][i]])
-                        text_ = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore')
+                        for i in range(len(indexes[0])):
+                            text = remove_punctuation(lines[indexes[0][i]])
+                            text_ = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore')
                 
-                        clean_text += text_.decode("utf-8") + "\n\n" 
-                    store_text(path, url, clean_text, word)
-            except:  
-                print("Web page " + url + "could not be scraped") 
+                            clean_text += text_.decode("utf-8") + "\n\n" 
+                        store_text(path, url, clean_text, word)
+                    break
+                except:  
+                     print("Web page " + url + " could not be scraped") 
+
+                     #Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work. 
+                     #We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url 
+                     print("Skipping. Connnection error")
         
 
 
@@ -134,11 +160,11 @@ def apply_tfidf(texts, query):
         print("This text was not correctly downloaded due to an error while decoding")
         return np.zeros((2,1))
         
-    vectorizer = TfidfVectorizer(preprocess_text)
+    vectorizer = TfidfVectorizer(preprocessor = preprocess_text)
     docs_tfidf = vectorizer.fit_transform(texts)
     
-    query_nosymbol = unicodedata.normalize('NFKD', query.replace("_", " ")).encode('ASCII', 'ignore')
-    query_tfidf = vectorizer.transform([query_nosymbol.decode("utf-8")])
+    query_tfidf = query.replace("_", " ")
+    #query_tfidf = vectorizer.transform([query_nosymbol.decode("utf-8")])
     cosineSimilarities = cosine_similarity(query_tfidf, docs_tfidf).flatten()
     print(type(cosineSimilarities))
     print(cosineSimilarities)

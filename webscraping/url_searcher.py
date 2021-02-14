@@ -21,9 +21,9 @@ from downloader import download_text
 ## CAN BE ESTABLISHED BY THE USER ##
 
 output = os.getcwd()
-document = 'COpenMed_20201208.xlsx'
+document = ''
 min_searches = 10
-searches_threshold = 30
+searches_threshold = 25
 url_list = []
 
 def main(document, output, min_searches):
@@ -38,7 +38,7 @@ def main(document, output, min_searches):
     
     print("Checking if the urls in the xlsx are in any url.txt")
     
-    t0 = perf_counter()
+    
     for i in range(len(df_resources['URL'])):
         url = df_resources['URL'][i]
         word = list(df_entities.loc[df_entities['IdEntidad'] == df_resources['IdEntidad'][i] , 'Entidad'])
@@ -47,38 +47,56 @@ def main(document, output, min_searches):
         
         #We add all the urls to the document if they were not searched before
         if not check_resource_retrieved_before(url, output):
-            print("The url " + url + " has no match, adding to text file")
+            print("Number of elements in excel is: " + str(len(df_resources['URL'])))
+            print("We are in: " + str(i))
             if not url.endswith("pdf"):
+                print("The url " + url + " has no match, adding to text file")
                 urls2doc(url, word[-1], output)
             else: 
                 print("url: " + url + " is a pdf. Not supported yet")
-                      
+                
+    t0 = perf_counter()
+    download_text(output)  
+    t1 = perf_counter()
+    
+    t2 = perf_counter()                 
     for i in range(len(df_entities['IdEntidad'])):
     # We must check how many resources we will have for each entity. If we have less than 10 we will add manual search
     # for each entity until we reach 10.
     # We will not search for any resource if the resources for any entity surpasses a number of documents (30 is a temporal number)
-        num_resources_for_entity = df_resources.loc[df_resources['IdEntidad'] == df_resources['IdEntidad'][i]].shape[0]
-        print("We are now padding searches until we reach 10 for entity " + df_entities['Entidad'][i])
-            
-        #if not(num_resources_for_entity < min_searches and len(os.listdir(output + "/dir/" + str(df_entities['IdEntidad'][i])) + "/") < searches_threshold): 
-        if num_resources_for_entity < min_searches:
-            url_list = search_only(df_entities['Entidad'][i], min_searches - num_resources_for_entity, output)
-            
-            if len(url_list) != 0:
-                for m in url_list:
-                    urls2doc(m, df_entities['Entidad'][i], output)
-    t1 = perf_counter()   
-    print("Total time for loading of urls is: " + str(t1-t0))
-        
-    t2 = perf_counter()
-    download_text(output)  
-    t3 = perf_counter()
     
-    print("Total time for download of text is: " + str(t3-t2))
+        num_resources_for_entity = df_resources.loc[df_resources['IdEntidad'] == df_resources['IdEntidad'][i]].shape[0]
+        print("We are now padding searches until we reach " + min_searches + " for entity " + df_entities['Entidad'][i] + " which is " + str(i) + "/" + str(len(df_entities['IdEntidad'])))
+        
+        if os.path.exists(output + "/dir/" + str(df_entities['IdEntidad'][i])):
+            if len(os.listdir(output + "/dir/" + str(df_entities['IdEntidad'][i]))) < searches_threshold:
+                 
+                if num_resources_for_entity < min_searches:
+                    url_list = search_only(df_entities['Entidad'][i], min_searches - num_resources_for_entity, output)
+                else:
+                    break
+        else:
+            if num_resources_for_entity < min_searches:
+                url_list = search_only(df_entities['Entidad'][i], min_searches - num_resources_for_entity, output)
+            
+        if len(url_list) != 0:
+            for m in url_list:
+                urls2doc(m, df_entities['Entidad'][i], output)
+    
+    t3 = perf_counter() 
+    
+    t4 = perf_counter()
+    download_text(output)  
+    t5 = perf_counter()
+      
+    print("Total time for creating corpus for the xmls is: " + str(t1-t0))
+    print("Total time for download of new urls is: " + str(t3-t2))
+    print("Total time for creating corpus for the new downloaded urls is: " + str(t5-t4))
     
     f = open("time.txt", "w")
-    f.write("Total time for loading of urls is: " + str(t1-t0))
-    f.write("Total time for download of text is: " + str(t3-t2))
+    f.write("Total time for creating corpus for the xmls is: " + str(t1-t0))
+    f.write("Total time for download of new urls is: " + str(t3-t2))
+    f.write("Total time for creating corpus for the new downloaded urls is: " + str(t5-t4))
     f.close()
 
 if __name__ == "__main__":

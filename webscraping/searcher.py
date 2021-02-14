@@ -40,7 +40,7 @@ def google_search(word, url, n, searcher, out_path):
     Return : Generator (iterator) that yields found URLs. If the stop parameter is None the iterator will loop forever. 
     """
     list_searches = []
-    counter = 0
+    
 
     #We have two different functionalities: The user enters a word for searching or a specific url
     if len(url) != 0:
@@ -60,8 +60,8 @@ def google_search(word, url, n, searcher, out_path):
         print(out_path)
         
         list_searches = search_only(query, n, out_path)
-        if len(list_of_urls) != 0:
-            for url in list_of_urls:
+        if len(list_searches) != 0:
+            for url in list_searches:
                 urls2doc(url, query, out_path)
             download_text(out_path)
         else:
@@ -70,6 +70,7 @@ def google_search(word, url, n, searcher, out_path):
 
 def search_only(query, n, out_path):
     list_searches = []
+    counter = 0
     
     for i in search(query, tld="es", num=n, start=0, stop=None, pause=2):
             if (check_resource_retrieved_before(i, out_path)):
