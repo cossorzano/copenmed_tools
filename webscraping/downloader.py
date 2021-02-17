@@ -28,6 +28,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from check_resource import check_resource_retrieved_before
 from preprocessing import preprocess_text
 from proxies import get_proxies
+from tika import parser # pip install tika
 
 ##########################
 #    Static variables    #
@@ -61,14 +62,7 @@ def download_text(path):
     indexes: Positions of the numpy array where cosine simlarity surpass a threshold
     clean_text: Plain text with the relevant text
     """    
-    user_agent_list = [
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:77.0) Gecko/20100101 Firefox/77.0',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
-    ]
-    #proxies = ['121.129.127.209:80', '124.41.215.238:45169', '185.93.3.123:8080', '194.182.64.67:3128', '106.0.38.174:8080', '163.172.175.210:3128', '13.92.196.150:8080']
+    
     proxies = get_proxies()
     proxy_pool = cycle(proxies)
 
@@ -93,19 +87,28 @@ def download_text(path):
                 
                 try:
                     time.sleep(30)
-                    response = requests.get(url,proxies={"http": proxy, "https": proxy})
+                    response = requests.get(url)
+                    #response = requests.get(url,proxies={"http": proxy, "https": proxy})
                     print(response.json())
-                   
-                
-                    data = page.content
-                    soup = BeautifulSoup(data, 'html.parser')
-                    texts = soup.find_all(text=True)
+                    
+                    #Here we must do the clear separation between pdf and normal html.
+                    #If it is a pdf we should download the pdf and store it in a temporal file
+                    #Afterwards we will process the temporal pdf like a normal text
                     clean_plain_text = ''
                     clean_text = ''
-
-                    for t in texts:
-                        if t.parent.name not in blacklist:
-                            clean_plain_text += '{} '.format(t) #We have obtained the html (except the blacklist) as plain text
+                    
+                    if url.endswith("pdf"):
+                        with open('temporal.pdf', 'wb') as f:
+                            f.write(response.content)
+                        clean_plain_text = parser.from_file('temporal.pdf')
+                    
+                    else:
+                        data = page.content
+                        soup = BeautifulSoup(data, 'html.parser')
+                        texts = soup.find_all(text=True)
+                        for t in texts:
+                            if t.parent.name not in blacklist:
+                                clean_plain_text += '{} '.format(t) #We have obtained the html (except the blacklist) as plain text
         
                     lines = clean_plain_text.split('\n \n')
         

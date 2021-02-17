@@ -38,8 +38,8 @@ def main(document, output, min_searches):
     
     print("Checking if the urls in the xlsx are in any url.txt")
     
-    
-    for i in range(len(df_resources['URL'])):
+    for i in range(150):
+    #for i in range(len(df_resources['URL'])):
         url = df_resources['URL'][i]
         word = list(df_entities.loc[df_entities['IdEntidad'] == df_resources['IdEntidad'][i] , 'Entidad'])
         #print(word)
@@ -49,18 +49,17 @@ def main(document, output, min_searches):
         if not check_resource_retrieved_before(url, output):
             print("Number of elements in excel is: " + str(len(df_resources['URL'])))
             print("We are in: " + str(i))
-            if not url.endswith("pdf"):
-                print("The url " + url + " has no match, adding to text file")
-                urls2doc(url, word[-1], output)
-            else: 
-                print("url: " + url + " is a pdf. Not supported yet")
+            print("The url " + url + " has no match, adding to text file")
+            urls2doc(url, word[-1], output) 
+
                 
     t0 = perf_counter()
     download_text(output)  
     t1 = perf_counter()
     
-    t2 = perf_counter()                 
-    for i in range(len(df_entities['IdEntidad'])):
+    t2 = perf_counter()        
+    for i in range(30):         
+    #for i in range(len(df_entities['IdEntidad'])):
     # We must check how many resources we will have for each entity. If we have less than 10 we will add manual search
     # for each entity until we reach 10.
     # We will not search for any resource if the resources for any entity surpasses a number of documents (30 is a temporal number)
