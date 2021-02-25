@@ -9,6 +9,7 @@
 import argparse
 import os
 import pandas as pd
+import random
 from searcher import google_search
 from time import perf_counter
 
@@ -38,7 +39,9 @@ def main(document, output, min_searches):
     
     print("Checking if the urls in the xlsx are in any url.txt")
     
-    for i in range(150):
+    list_def_resources = random.shuffle(list(range(len(df_resources['URL']))))
+    print(list_def_resources)
+    for i in list_def_resources:
     #for i in range(len(df_resources['URL'])):
         url = df_resources['URL'][i]
         word = list(df_entities.loc[df_entities['IdEntidad'] == df_resources['IdEntidad'][i] , 'Entidad'])
@@ -58,7 +61,10 @@ def main(document, output, min_searches):
     t1 = perf_counter()
     
     t2 = perf_counter()        
-    for i in range(30):         
+    
+    list_df_entities = random.shuffle(list(range(len(df_entities['IdEntidad']))))
+    
+    for i in list_df_entities:    
     #for i in range(len(df_entities['IdEntidad'])):
     # We must check how many resources we will have for each entity. If we have less than 10 we will add manual search
     # for each entity until we reach 10.

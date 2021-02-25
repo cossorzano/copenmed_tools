@@ -25,16 +25,16 @@ def preprocess_text(lines):
 
     stemmer = PorterStemmer() #can be changed to lemmalization if necessary
     final = []
-    
+
     for line in lines:
         tokens = wordpunct_tokenize(line)
+
         clean = [stemmer.stem(token)
                  for token in tokens
                  if token.lower() not in stop_words 
                  and len(token) > 2
                  and all(c.isalnum() for c in token)
-                ]
-              
-        final.append([stemmer.stem(word) for word in clean if len(clean) > 2])
-        
+                ]    
+        final.append([stemmer.stem(word) for word in clean]) 
+
     return final

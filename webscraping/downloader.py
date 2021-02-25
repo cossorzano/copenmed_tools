@@ -14,6 +14,8 @@ import requests
 import re
 import glob
 import os
+import sys
+import traceback
 import numpy as np
 import pandas as pd
 import unicodedata
@@ -24,6 +26,7 @@ from itertools import cycle
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from nltk.tokenize import wordpunct_tokenize
 
 from check_resource import check_resource_retrieved_before
 from preprocessing import preprocess_text
@@ -52,6 +55,25 @@ blacklist = [
 ########################
 #    Function Steps    #
 ########################
+"""
+def main(path):
+    get_proxies()
+    get_path()
+    check_resource_and status()
+    load_non_searched_resources()
+    load_new_resources()
+    downloader()
+    cleaner()
+    apply_tfidf()
+    text_selector_by_threshold()
+    text_cleaner()
+    storer()
+"""
+
+
+###################
+#    Functions    #
+###################
 
 def download_text(path):
     """
@@ -74,6 +96,9 @@ def download_text(path):
         content = line.split(" ", 1)
         url = content[0]
         word = content[1]
+        clean_plain_text = ''
+        clean_text = ''
+        final = []        
         if check_resource_retrieved_before(url, path):
             print("Resource " + url + " has already been searched, skipping...")
                    
@@ -82,43 +107,57 @@ def download_text(path):
         else:
             for i in range(1,11):
                 #Get a proxy from the pool
-                proxy = next(proxy_pool)
+                #proxy = next(proxy_pool)
                 print("Request #%d"%i)
                 
                 try:
                     time.sleep(30)
-                    response = requests.get(url)
+                    response = requests.get(url, params={
+            "api_key": "5E9RVCSYP1K8BO71XSO1YPDK18LI4PZWO1PM5X2ZF9UE876H8F1LKEB12VV95NYRLY7BBKY3EBN5X4M8",
+            "url": "http://httpbin.org/headers?json",  
+        },)      
+                    #response = requests.get(url)
                     #response = requests.get(url,proxies={"http": proxy, "https": proxy})
-                    print(response.json())
+                    print('Response HTTP Status Code: ', response.status_code)
+                    #print('Response HTTP Response Body: ', response.content)
+                   
+                    #print(response.json())
                     
                     #Here we must do the clear separation between pdf and normal html.
                     #If it is a pdf we should download the pdf and store it in a temporal file
                     #Afterwards we will process the temporal pdf like a normal text
-                    clean_plain_text = ''
-                    clean_text = ''
-                    
+
                     if url.endswith("pdf"):
                         with open('temporal.pdf', 'wb') as f:
                             f.write(response.content)
                         clean_plain_text = parser.from_file('temporal.pdf')
                     
                     else:
-                        data = page.content
+                        data = response.text
+                        print("We have stored the content in data")
                         soup = BeautifulSoup(data, 'html.parser')
                         texts = soup.find_all(text=True)
                         for t in texts:
                             if t.parent.name not in blacklist:
                                 clean_plain_text += '{} '.format(t) #We have obtained the html (except the blacklist) as plain text
-        
+                
+                    
+                    print("We have stored the lines")
                     lines = clean_plain_text.split('\n \n')
-        
+
+                   
                     for line in lines[:]:
                         #Sería mejor almacenarlo en otro objeto porque es raro modificar el mismo objeto sobre el cual se itera
                         if len(line.strip()) < 3 or '^' in line or len(line.split()) < 2:
                             lines.remove(line)
-                
-                    values = apply_tfidf(lines, word)
-                    print(type(values))
+
+                    print("We have stripped the lines")
+                    values = apply_tfidf(lines, word.rstrip("\n"))
+                    
+                    if len(texts) == 0:
+                        print("This text was not correctly downloaded due to an error while decoding")
+ 
+
                     if max(values) < max_value:
                         #If the max value of cosine similarity is lower than the max_value acceptable
                         # we may be working with text in another language, thus, we dont want this text
@@ -134,17 +173,25 @@ def download_text(path):
                         for i in range(len(indexes[0])):
                             text = remove_punctuation(lines[indexes[0][i]])
                             text_ = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore')
-                
+             
                             clean_text += text_.decode("utf-8") + "\n\n" 
                         store_text(path, url, clean_text, word)
                     break
                 except:  
-                     print("Web page " + url + " could not be scraped") 
+                    print("Web page " + url + " could not be scraped") 
 
-                     #Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work. 
-                     #We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url 
-                     print("Skipping. Connnection error")
-        
+                    #Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work. 
+                    #We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url 
+                    print("Skipping. Connnection error")
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    print("Error in line " + str(exc_tb.tb_lineno) + "  " + str(exc_type))
+                    print(traceback.print_exc())
+                
+def identity_preprocessor(text):
+    return text
+
+def identity_tokenizer(text):
+    return text        
 
 
 def apply_tfidf(texts, query):
@@ -162,14 +209,15 @@ def apply_tfidf(texts, query):
     if len(texts) == 0:
         print("This text was not correctly downloaded due to an error while decoding")
         return np.zeros((2,1))
-        
-    vectorizer = TfidfVectorizer(preprocessor = preprocess_text)
+    print(type(texts))    
+    vectorizer = TfidfVectorizer(preprocess_text)
     docs_tfidf = vectorizer.fit_transform(texts)
     
-    query_tfidf = query.replace("_", " ")
-    #query_tfidf = vectorizer.transform([query_nosymbol.decode("utf-8")])
+    query_nosymbol = query.replace("_", " ")
+    query_tfidf = vectorizer.transform([query_nosymbol])
+
     cosineSimilarities = cosine_similarity(query_tfidf, docs_tfidf).flatten()
-    print(type(cosineSimilarities))
+
     print(cosineSimilarities)
     return cosineSimilarities
 
@@ -272,6 +320,8 @@ def store_text(path, url, text, word):
     f2 = open(file_url, "w")
     f2.write(str(url))
     f2.close()
+    
+
         
     
 
