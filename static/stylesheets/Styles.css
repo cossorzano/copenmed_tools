@@ -1,0 +1,161 @@
+html,body {
+    position:fixed;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+.top_menu {
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+}
+
+.left_menu {
+    -moz-box-shadow:    1px 0 5px -2px black;
+    -webkit-box-shadow: 1px 0 5px -2px black;
+    box-shadow:         1px 0 5px -2px black;
+}
+
+.menu_item::after {
+    border-bottom: solid medium #ff5ac2;
+    display:block;
+    content: '';
+    transform: scaleX(0);
+    transition: transform 250ms ease-in-out;
+    width: 50%;
+    margin: auto;
+}
+
+.menu_item:hover::after {
+    transform: scaleX(1);
+}
+
+.menu_link:hover {
+    color: #ff5ac2 !important;
+}
+
+@media (max-width: 768px) {
+    .menu_item {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+}
+
+/* Style for not active menu pills*/
+.nav-pills.right_pill .nav-link.right_pill:not(.active) {
+    background-color: transparent;
+    color: #4fff6d;
+    font-weight: bold;
+}
+
+/* Style for active menu pills*/
+.nav-pills.right_pill .nav-link.right_pill {
+    background-color: #4fff6d;
+    color: black;
+    font-weight: bold;
+}
+
+/* Hover effect for not active menu pills */
+.nav-pills.right_pill .nav-link.right_pill:not(.active):hover {
+    background-color: rgb(41, 43, 44);
+    transition: 0.3s;
+    color: #4fff6d;
+    font-weight: bold;
+}
+
+.gui_pane {
+    color: white;
+}
+
+#updateButton {
+    background-color: #4fff6d;
+    color: black;
+    border: none;
+}
+
+#updateButton:hover {
+    background-color: #298036;
+    color: black;
+    border: none;
+}
+#updateButton:active #updateButton:focus {
+    outline-color: rgb(41, 43, 44) !important;
+}
+
+.card-container {
+    position: relative;
+    background-color: #485355;
+    border-radius: 10px;
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+    touch-action: none;
+    margin-top: 12px;
+    margin-bottom: 10px;
+    border-top: 5px solid #ff6ac2;
+    display: flex;
+    flex-wrap: nowrap
+}
+
+.container_label {
+    position: relative;
+    width: 300px;
+    background-color: #485355;
+    height: 5vh;
+    border-radius: 10px;
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+    touch-action: none;
+    margin-top: 12px;
+    margin-bottom: 10px;
+    border-bottom: 5px solid #ff6ac2;
+    display: flex;
+}
+
+.container_label div {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.horizontal-scrollable > .row {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.horizontal-scrollable > .row > .col {
+    display: inline-block;
+    float: none;
+}
+
+.selection-menu{
+    background-color: #485355;
+    -moz-box-shadow:    1px 4px 15px -4px black;
+    -webkit-box-shadow: 1px 4px 15px -4px black;
+    box-shadow:         1px 4px 15px -4px black;
+    border-radius: 10px;
+}
+
+.selection-menu > li > a:not(.active):hover{
+    background-color: #303136 !important;
+    color:#fff;
+}
+
+.selection-menu > li > a{
+    background-color: #ff6ac2 !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.selection-menu > li > a:not(.active){
+    background-color: #485355 !important;
+    color: white !important;
+}

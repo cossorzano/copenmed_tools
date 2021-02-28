@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+    <head>
+        {% load bootstrap4 %}
+        {% bootstrap_css %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CopenMed Visor</title>
+        <link rel="stylesheet" href="{% static 'stylesheets/Styles.css' %}">
+        <link rel="stylesheet" href="{% static 'stylesheets/Utils.css' %}">
+    </head>
+
+    <header>
+        <nav class="navbar navbar-expand-md bg-dark navbar-dark top_menu">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'Images/ceo_logo.png' %}" alt="Logo" style="width:80px;">
+            </a>
+
+            <!-- Toggler/collapsibe Button -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar links -->
+            <div class="collapse navbar-collapse justify-content-center nav-justified" id="collapsibleNavbar">
+                <ul class="navbar-nav" style="width: 100%;">
+                    <li class="nav-item menu_item">
+                        <a class="nav-link menu_link" href="#">About CopenMed</a>
+                    </li>
+                    <li class="nav-item menu_item">
+                        <a class="nav-link menu_link" href="#">Tutorial</a>
+                    </li>
+                    <li class="nav-item menu_item">
+                        <a class="nav-link menu_link" href="#">Contact Us</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <body class="bg-dark">
+        <div class="row h-100">
+            <div class="col left_menu flex-fixed-width-item d-flex " style="padding-top: 50px;">
+                <ul class="nav nav-pills right_pill justify-content-center" style="margin-left: 10px">
+                    <li class="nav-item">
+                        <a class="active nav-link right_pill" data-toggle="pill" href="#Choices">Choices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link right_pill" data-toggle="pill" href="#Selections">Selections</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link right_pill" data-toggle="pill" href="#Write">Write</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col" style="margin: 20px; margin-right: 30px;">
+                <div class="row" style="padding-bottom: 20px">
+                    <button type="button" class="btn btn-primary btn-lg btn-block" id="updateButton">Update</button>
+                </div>
+                <div class="row tab-content h-100 w-100">
+                        <div id="Choices" class="tab-pane fade show active gui_pane w-100 h-100">
+                            <div class="container position-fixed horizontal-scrollable h-100">
+                                <div class="row" style="margin: 20px">
+                                    <h3 data-toggle="collapse" data-target="#choicesDescription" style="cursor: pointer;">
+                                        Avalaible Choices
+                                    </h3>
+                                    <p class="collapse" id="choicesDescription">
+                                        Here will be presented some predictions based on your current selections. You can choose any
+                                        of them or use the browser if they are not appropriate.
+                                    </p>
+                                </div>
+                                <div class="row flex-nowrap" style="margin: 20px;">
+                                    <div class="col h-100">
+                                        <div class="container_label">
+                                            <div style="flex-grow: 1;">Causes</div>
+                                        </div>
+                                        <div class="card-container" style="padding: 20px;">
+                                            Hola
+                                        </div>
+                                    </div>
+                                    <div class="col h-100">
+                                        <div class="container_label">
+                                            <div style="flex-grow: 1;">Observables</div>
+                                        </div>
+                                        <div class="card-container" style="padding: 20px;">
+                                            Hola
+                                        </div>
+                                    </div>
+                                    <div class="col h-100">
+                                        <div class="container_label">
+                                            <div style="flex-grow: 1;">Tests</div>
+                                        </div>
+                                        <div class="card-container" style="padding: 20px;">
+                                            Hola
+                                        </div>
+                                    </div>
+                                    <div class="col h-100">
+                                        <div class="container_label">
+                                            <div style="flex-grow: 1;">Consequences</div>
+                                        </div>
+                                        <div class="card-container" style="padding: 20px;">
+                                            Hola
+                                        </div>
+                                    </div>
+                                    <div class="col h-100">
+                                        <div class="container_label">
+                                            <div style="flex-grow: 1;">Facts</div>
+                                        </div>
+                                        <div class="card-container" style="padding: 20px;">
+                                            Hola
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div id="Selections" class="tab-pane fade gui_pane">
+                        <div class="container position-fixed horizontal-scrollable">
+                            <div class="row" style="margin: 20px">
+                                <h3 data-toggle="collapse" data-target="#selectionsDescription" style="cursor: pointer;">
+                                    Your Selections
+                                </h3>
+                                <p class="collapse" id="selectionsDescription">
+                                    Here you can see a list of your current positive and negative selections
+                                    (which will be used to update our predictions). You can deselect them or move
+                                    them to other group.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="Write" class="tab-pane fade gui_pane">
+                        <div class="container position-fixed">
+                            <div class="row" style="margin: 20px">
+                                <h3 data-toggle="collapse" data-target="#writeDescription" style="cursor: pointer;">
+                                    Write
+                                </h3>
+                                <p class="collapse" id="writeDescription">
+                                    Work in progress...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% bootstrap_javascript jquery='full' %}
+    </body>
+</html>

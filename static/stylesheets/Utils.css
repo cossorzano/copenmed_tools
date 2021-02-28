@@ -1,0 +1,4 @@
+/*Fix width of a columnt*/
+.flex-fixed-width-item {
+    flex: 0 0 150px;
+}
