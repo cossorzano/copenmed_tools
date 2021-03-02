@@ -98,12 +98,7 @@ def urls2doc(url, word, dir_path):
                         
 
 if __name__ == "__main__":
-    
-######################
-# PROGRAMA PRINCIPAL #
-######################
 
-    # Argparse - Insert parameters from command line
     parser = argparse.ArgumentParser(description="Search by terms")
 
     parser.add_argument('-w',

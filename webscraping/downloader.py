@@ -112,10 +112,7 @@ def download_text(path):
                 
                 try:
                     time.sleep(30)
-                    response = requests.get(url, params={
-            "api_key": "5E9RVCSYP1K8BO71XSO1YPDK18LI4PZWO1PM5X2ZF9UE876H8F1LKEB12VV95NYRLY7BBKY3EBN5X4M8",
-            "url": "http://httpbin.org/headers?json",  
-        },)      
+                    response = requests.get(url)      
                     #response = requests.get(url)
                     #response = requests.get(url,proxies={"http": proxy, "https": proxy})
                     print('Response HTTP Status Code: ', response.status_code)

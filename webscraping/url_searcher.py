@@ -39,10 +39,8 @@ def main(document, output, min_searches):
     
     print("Checking if the urls in the xlsx are in any url.txt")
     
-    list_def_resources = random.shuffle(list(range(len(df_resources['URL']))))
-    print(list_def_resources)
-    for i in list_def_resources:
-    #for i in range(len(df_resources['URL'])):
+
+    for i in range(len(df_resources['URL'])):
         url = df_resources['URL'][i]
         word = list(df_entities.loc[df_entities['IdEntidad'] == df_resources['IdEntidad'][i] , 'Entidad'])
         #print(word)
@@ -62,10 +60,9 @@ def main(document, output, min_searches):
     
     t2 = perf_counter()        
     
-    list_df_entities = random.shuffle(list(range(len(df_entities['IdEntidad']))))
-    
-    for i in list_df_entities:    
-    #for i in range(len(df_entities['IdEntidad'])):
+
+ 
+    for i in range(len(df_entities['IdEntidad'])):
     # We must check how many resources we will have for each entity. If we have less than 10 we will add manual search
     # for each entity until we reach 10.
     # We will not search for any resource if the resources for any entity surpasses a number of documents (30 is a temporal number)
@@ -105,12 +102,7 @@ def main(document, output, min_searches):
     f.close()
 
 if __name__ == "__main__":
-    
-######################
-# PROGRAMA PRINCIPAL #
-######################
 
-    # Argparse - Insert parameters from command line
     parser = argparse.ArgumentParser(description="Search by terms")
 
     parser.add_argument('-d',
