@@ -75,24 +75,6 @@ def count_edges(edge_dict):
         entities_count[idEntity][2]=entities_count[idEntity][0]+entities_count[idEntity][1]
     return entities_count
 
-def report_edge_mistakes(edge_dict, edge_type_dict, entity_dict):
-    for keyEdge in edge_dict:
-        edge = edge_dict[keyEdge]
-        edgeType = edge[2]
-        edgeType1 = edge_type_dict[edgeType][0]
-        edgeType2 = edge_type_dict[edgeType][1]
-
-        idEntity1 = edge[0]
-        idEntity2 = edge[1]
-        entityType1 = entity_dict[idEntity1][1]
-        entityType2 = entity_dict[idEntity2][1]
-        if entityType1!=edgeType1 and entityType2!=edgeType2:
-            print("%s (%d) -> %s (%d) [%s]"%(entity_dict[idEntity1][0],
-                                             idEntity1,
-                                             entity_dict[idEntity2][0],
-                                             idEntity2,
-                                             edge[3]))
-
 def add_directional_edges(edge_dict, list_bidirectional_relations):
     edges_present = {}
     for keyEdge in edge_dict:
@@ -124,6 +106,28 @@ def add_directional_edges(edge_dict, list_bidirectional_relations):
         nextKey+=1
         N+=1
     print("%d new edges added"%N)
+
+def define_labels(entity_type_dict, edge_type_dict):
+    id_dict = {}
+    for idEntityType in entity_type_dict:
+        name, _, _ = entity_type_dict[idEntityType]
+        id_dict[name]=idEntityType
+    
+    def find_edge(name):
+        rightId = None
+        for idEdgeType in edge_type_dict:
+            edgeType = edge_type_dict[idEdgeType]
+            edgeName = edgeType[3]
+            if edgeName==name:
+                rightId = idEdgeType
+        id_dict[name]=rightId
+    find_edge("Disease causes Symptom")
+    find_edge("Disease1 may evolve and coexist with Disease2")
+    find_edge("Disease belongs to Group")
+    find_edge("Symptom is associated to Disease")
+    find_edge("Disease is observed in Anatomy")
+    return id_dict
+
 
 class Node():
     def __init__(self, idEntity, idEntityType, entityName, id_dict):
@@ -286,8 +290,6 @@ if __name__=="__main__":
     if len(sys.argv) <= 1:
         print("Usage: python3 copenmed_tools excel2pkl <excelfile>")
         print("   <excelfile> must contain the Excel sheets of COpenMed")
-        print("Usage: python3 copenmed_tools check <pklfile>")
-        print("   <pklfile> must be produced by excel2pkl")
         sys.exit(1)
     
     if sys.argv[1]=="excel2pkl":
@@ -317,14 +319,3 @@ if __name__=="__main__":
         pickle.dump(obj,outfile)
         outfile.close()
         
-    elif sys.argv[1]=="check":
-        fnPickle = sys.argv[2]
-        lang_dict, lang_dict_info, entity_type_dict, entity_type_dict_info,\
-        entity_dict, entity_dict_info, edge_type_dict, edge_type_dict_info, \
-        list_bidirectional_relations, \
-        edge_dict, edge_dict_info, details_dict, details_dict_info, \
-        resources_dict, resources_dict_info = \
-        load_database(fnPickle)
-    
-        report_edge_mistakes(edge_dict, edge_type_dict, entity_dict)
-
