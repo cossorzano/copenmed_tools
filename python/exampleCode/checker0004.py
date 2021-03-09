@@ -55,6 +55,33 @@ class Checker():
                                    path.pretty(self.entity_dict, 
                                                self.edge_type_dict,redundant_list,directEdgeType)))
 
+    def checkSpecialty(self):
+        specialty_dict = {}
+        DISEASE = self.id_dict['Disease']
+        GROUPOFDISEASES = self.id_dict['GroupOfDiseases']
+        for idEdge in self.edge_dict:
+            edge = self.edge_dict[idEdge]
+            idEntity = edge[0]
+            entityType = self.entity_dict[idEntity][1]
+            if not entityType==DISEASE and not entityType==GROUPOFDISEASES:
+                continue
+            if not idEntity in specialty_dict:
+                specialty_dict[idEntity]  = 0
+            edge_name = edge[3]
+            inTheDomain = "Specialty" in edge_name
+            if inTheDomain:
+                specialty_dict[idEntity] = 1
+        print("Entidades sin especialidad: =============================")
+        toPrint=""
+        Ncount=0
+        for idEntity, value in specialty_dict.items():
+            if value==0:
+                toPrint+="%d, "%idEntity
+                Ncount+=1
+        print(toPrint)
+        print("Numero de entidades sin especialidad: %d"%Ncount)
+        return specialty_dict
+    
     def checkPrevalence(self):
         prevalence_dict = {}
         DISEASE = self.id_dict['Disease']
@@ -124,6 +151,7 @@ class Checker():
         print("Numero de entidades aisladas: %d"%Ncount)
         
     def checkEdgeMistakes(self):
+        print("Analisis de enlaces mal formados: =============================")
         Ncount = 0
         for keyEdge in self.edge_dict:
             edge = self.edge_dict[keyEdge]
@@ -151,6 +179,7 @@ class Checker():
         print("Numero de relaciones mal formadas: %d"%Ncount)
 
     def checkNoUsar(self):
+        print("Analisis de relaciones NO USAR: =============================")
         Ncount = 0
         for keyEdge in self.edge_dict:
             edge = self.edge_dict[keyEdge]
@@ -168,6 +197,7 @@ class Checker():
 if __name__=="__main__":                                
     checker = Checker()
     #checker.checkRedundancy()
+    checker.checkSpecialty()
     #checker.checkPrevalence()
     #checker.checkDescriptionLevel()
     #checker.checkNumberOfEdges()
