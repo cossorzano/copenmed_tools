@@ -233,6 +233,13 @@ class Path():
                      edgeStrength, entity_dict[idEntity][0], idEntity)
         retval+="]"
         return retval
+    
+    def getEdgeTypes(self):
+        edgeTypes = []
+        for _, _, idEdgeType, _ in self.path:
+            if idEdgeType is not None:
+                edgeTypes.append(idEdgeType)
+        return edgeTypes
           
 
 class Graph():
