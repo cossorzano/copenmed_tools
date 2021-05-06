@@ -33,7 +33,8 @@ def bidirectional_relations(edge_type_dict):
                         " can be seen also with " in edge_name or \
                         "Substance is Treatment" in edge_name
         if bidirectional:
-            list_bidirectional_relations.append(idEdge)
+            if idEdge!=180: # Pathogen is also Cause
+                list_bidirectional_relations.append(idEdge)
     return list_bidirectional_relations
             
 def load_database(fn):
