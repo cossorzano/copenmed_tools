@@ -81,6 +81,7 @@ class Reasoner0003(COpenMedReasoner):
         self.w['prevencion'] = readSheet("PREVENCION")
         self.w['similar'] = readSheet("SIMILAR")
         self.w['atencion'] = readSheet("ATENCION")
+        self.w['especialidades'] = readSheet("ESPECIALIDAD")
 
     def define_labels(self):
         self.id_dict = {}
@@ -209,6 +210,15 @@ class Reasoner0003(COpenMedReasoner):
         aux *= 1.0/np.max(aux)
         self.score['atencion'] += aux
         self.score['atencion'] *= 1.0/np.max(self.score['atencion'])            
+
+    def calculateSpecialty(self, x=None):
+        """ Calculate causes first """
+        if x is None:
+            x=self.score['causas']
+        if self.debug:
+            self.fhLog.write("\nCalculando especialidades: ======== \n")
+        self.score['especialidades'] = self.propagate(self.w['especialidades'], x)
+        self.score['especialidades'] *= 1.0/np.max(self.score['especialidades'])
 
     def propagateDown(self, weight, scoreIn, tol=1e-4):
         scoreOut=np.zeros(scoreIn.shape[0])
@@ -421,6 +431,15 @@ class Reasoner0003Viewer():
                         score['tratamientos'])
         print(" ")
 
+    def showSpecialties(self):
+        reasoner.calculateSpecialty()
+        id_dict = self.reasoner.id_dict
+        score = self.reasoner.score
+        print("SPECIALTIES --------------")
+        self.printScore([id_dict["Specialty"]],
+                        score['especialidades'])
+        print(" ")
+
     def showFacts(self):
         entity_dict = self.reasoner.entity_dict
         hechos = self.reasoner.hechos
@@ -447,6 +466,7 @@ if __name__=="__main__":
             viewer.showObservables()
             viewer.showTests()
             viewer.showConsequences()
+            viewer.showSpecialties()
             viewer.showFacts()
         elif action=="show causes":
             viewer.showCauses()
@@ -462,6 +482,8 @@ if __name__=="__main__":
             viewer.showAttention()
         elif action=="show facts":
             viewer.showFacts()
+        elif action=="show specialties":
+            viewer.showSpecialties()
         elif action=="help":
             print("Actions:")
             print("   select <N>")
@@ -472,7 +494,14 @@ if __name__=="__main__":
             print("   show consequences")
             print("   show treatments")
             print("   show attention")
+            print("   show specialties")
             print("   show facts")
             print("   help")
     
         action = input("Elige tu siguiente accion (select, help, show):")
+
+# Path: hechos -> hechos (similar)
+#       hechos -> causas
+#       causas -> prevencion, observables, consecuencias, tratamientos, tests
+#                 observables -> observables (similar)
+#       tratamientos -> atencion
