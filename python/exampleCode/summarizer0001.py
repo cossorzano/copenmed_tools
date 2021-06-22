@@ -289,7 +289,7 @@ class Summarizer():
         return "Tipo no conocido"
 
 summarizer = Summarizer(Reasoner0003())
-#print(summarizer.summarize(503)) # Sintoma
+print(summarizer.summarize(503)) # Sintoma
 #print(summarizer.summarize(11)) # Enfermedad
 #print(summarizer.summarize(111)) # Grupo de enfermedades
 #print(summarizer.summarize(16)) # Tratamiento
@@ -299,6 +299,6 @@ summarizer = Summarizer(Reasoner0003())
 #print(summarizer.summarize(206)) # Test
 #print(summarizer.summarize(361)) # Grupo de tests
 #print(summarizer.summarize(210)) # Resultado
-print(summarizer.summarize(771)) # Patogeno
+#print(summarizer.summarize(771)) # Patogeno
 #print(summarizer.summarize(141)) # Causa
 #print(summarizer.summarize(1067)) # Riesgo

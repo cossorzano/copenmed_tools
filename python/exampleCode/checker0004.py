@@ -60,6 +60,7 @@ class Checker():
                          86,  # Test is useful to diagnose this Group
                          93,  # Disease may evolve and coexist with Group
                          94,  # Group1 may evolve and cause Group2
+                         97,  # Symptom is also a Group of diseases
                          101, # Group may evolve to Disease
                          104, # Treatment may cause Group
                          108, # Treatment1 is precursor of Treatment2
@@ -70,49 +71,62 @@ class Checker():
                          134, # Anatomy may cause Symptom
                          144, # Group is produced by Anatomy
                          147, # Treatment is related to substance
+                         148, # Group can be diagnosed with Test
                          154, # Test is used in Anatomy
                          157, # Cause1 is similar to Cause2
                          158, # Symptom may evolve to Disease
                          163, # Disease may evolve to Group
                          164, # Substance is related to Disease
+                         173, # Activity is related to Substance
                          174, # Pathogen can cause Group
                          176, # Treatment is applied in Anatomy
                          179, # Disease causes Symptom
                          181, # Substance increases this Function
                          183, # Symptom increases Substance
                          190, # If Function1 decreases, Function2 increases
+                         204, # Group has effect on Anatomy
                          209, # Treatment prevents Disease
                          214, # Symptom is related to Anatomy
                          215, # Treatment should be avoided if Disease is present
                          216, # Treatment should be avoided if Group is present
+                         218, # Treatment should be avoided if Group is given
                          221, # Disease is treated by Activity
                          224, # Treatment1 can be complemented with Treatment2
                          232, # Disease1 should be prevented from evolving to Disease2
                          236, # Disease1 may cause Disease2 to get worse
                          238, # Group may cause Disease to get worse
                          241, # Group of treatments may cause Group of diseases
+                         242, # Group of treatments may prevent Group of diseases
                          247, # Cause promotes Pathogen
                          251, # Group may evolve and coexist with Disease
                          259, # Symptom is related to Activity
                          263, # Treatment is used in Test
                          266, # Cause may require Test
                          272, # Group1 is similar to Group2
+                         274, # Treatment may cause Symptom
                          289, # Cause can be treated with Treatment
                          290, # Cause can be treated by Group
                          291, # Disease1 is seen with Disease2
                          292, # Disease is seen with Group
                          293, # Group is seen with Disease
+                         294, # Group1 is seen with Group2
                          298, # Substance is related to Cause
                          305, # Activity involves Anatomy
                          315, # Disease is related to Substance
                          316, # Substance is related to Anatomy
+                         321, # The prevalence of this Disease in this Population is
                          324, # Diseases affects Anatomy
                          334, # Group implies TestResult
                          339, # Disease seldom causes Symptom
                          344, # Treatment prevents Activity
                          347, # Pathogen1 transmits or promotes Pathogen2
-                         351, # Treatment can be used against Pathogen 
+                         351, # Treatment can be used against Pathogen
+                         357, # Test is contraindicated if this Disease is present
                          374, # Pathogen gives TestResult
+                         384, # Symptom is related to Substance
+                         385, # Cause may cause condition
+                         387, # Disease is seen with Condition
+                         403, # Condition can be treated with Treatment
                          ]
         nonRedundant2 = [4,   # Anatomy1 is related to Anatomy2
                          6,   # Treatment1 enhances the effect of Treatment2
@@ -126,6 +140,7 @@ class Checker():
                          31,  # Disease can be treated with Treatment
                          32,  # Disease can be treated with this Group
                          45,  # Result is measured with Test
+                         49,  # Substance can cause Disease 
                          56,  # Pathogen causes disease
                          57,  # Pathogen does not cause Disease
                          60,  # Activity may cause Symptom
@@ -137,11 +152,13 @@ class Checker():
                          78,  # GroupOfDiseases can be treated with GroupOfTreatments
                          79,  # Cause can cause this Group
                          84,  # Group may cause symptom
+                         86,  # Test is useful to diagnose this Group
                          94,  # Group1 may evolve and cause Group2
                          96,  # Activity may prevent Group
                          101, # Group may evolve to Disease
                          104, # Treatment may cause Group
                          117, # Symptom requires Test
+                         124, # Test can measure Substance
                          125, # Group belongs to the domain of Specialty
                          126, # Disease is more observed in Population
                          127, # Disease is less observed in Population
@@ -179,12 +196,15 @@ class Checker():
                          292, # Disease is seen with Group
                          293, # Group is seen with Disease
                          299, # Group is more observed in Population
+                         300, # Population is under the domain of Specialty
                          305, # Activity involves Anatomy
                          315, # Disease is related to Substance
                          316, # Substance is related to Anatomy
+                         325, # Group affects Anatomy
                          339, # Disease seldom causes Symptom
                          344, # Treatment prevents Activity
                          347, # Pathogen1 transmits or promotes Pathogen2
+                         350, # Group is applied to Population
                          351, # Treatment can be used against Pathogen 
                          374, # Pathogen gives TestResult
                          ]
@@ -210,12 +230,21 @@ class Checker():
                      (67,   # Symptom can be treated with Group
                       66,   # Symptom can be treated with Treatment
                       5),   # Treatment belongs to the GroupOfTreatments
+                     (73,   # A positive testResult implies Symptom
+                      45,   # Result is measured with Test
+                      85),  # Test is useful to better study this Symptom
+                     (118,  # Symptom requires Group
+                      117,  # Symptom requires Test
+                      116), # Test belongs to Group
                      (131,  # Group can be observed in Anatomy
                       131,
                       3),   # Anatomy1 is part of Anatomy2
                      (154,  # Test is used in Anatomy
                       116,  # Test belongs to Group
                       341), # Group is used in Anatomy
+                     (185,  # Function is performed by Anatomy
+                      186,  # Function increase causes Symptom
+                      24),  # Symptom can be observed in Anatomy
                      (192,  # Treatment has effect on Anatomy
                       5,    # Treatment belongs to the GroupOfTreatments
                       204), # Group has effect on Anatomy
@@ -424,9 +453,6 @@ class Checker():
                      (334,  # Group implies TestResult
                       334,
                       365), # Result1 is a subtype of Result2
-                     (334,  # Group implies TestResult
-                      76,   # Group1 is a subgroup of Group2
-                      334), 
                      (355,  # Pathogen can be confirmed with Test
                       100,  # Pathogen1 is a subtype of Pathogen2
                       355),

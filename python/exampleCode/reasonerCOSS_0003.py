@@ -458,6 +458,12 @@ if __name__=="__main__":
     while action!="":
         if action=="alergia":
             action="select 294 296 297 -101 713 -481 -871 -445 4242 -4504 -28 -5171 -3914"
+        elif action=="vesicula":
+            action="select 168 49 1135"
+        elif action=="espalda":
+            action="select 499 3345"
+        elif action=="hinchazon":
+            action="select 2689 832 4776 7486 7487"
         
         if action.startswith("select"):
             reasoner.newFacts(" ".join(action.split()[1:]))
