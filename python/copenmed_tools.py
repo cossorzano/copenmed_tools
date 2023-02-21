@@ -1,5 +1,7 @@
+import codecs
 import copy
 import os
+import math
 import numpy as np
 import pandas as pd
 import pickle
@@ -139,15 +141,16 @@ class Node():
         self.outgoingEdges = {}
         self.reachableDown = {}
         self.reachableUp = {}
+        self.id_dict = id_dict
     
-    def addOutgoingEdge(self, idEntityTo, idEdgeType, strength):
-        edgeKey = (idEntityTo, idEdgeType)
+    def addOutgoingEdge(self, idEntityTo, idEdgeType, strength, idEdge):
+        edgeKey = (idEntityTo, idEdgeType, idEdge)
         if not edgeKey in self.outgoingEdges:
             self.outgoingEdges[edgeKey] = 0.0
         self.outgoingEdges[edgeKey] += strength
 
-    def addIncomingEdge(self, idEntityFrom, idEdgeType, strength):
-        edgeKey = (idEntityFrom, idEdgeType)
+    def addIncomingEdge(self, idEntityFrom, idEdgeType, strength, idEdge):
+        edgeKey = (idEntityFrom, idEdgeType, idEdge)
         if not edgeKey in self.incomingEdges:
             self.incomingEdges[edgeKey] = 0.0
         self.incomingEdges[edgeKey] += strength
@@ -157,18 +160,19 @@ class Node():
             return [Path(self.idEntity, weight)]
         
         paths = []
-        for idEntityTo, idEdgeType in self.outgoingEdges:
-            strength = self.outgoingEdges[(idEntityTo, idEdgeType)]
+        for idEntityTo, idEdgeType, idEdge in self.outgoingEdges:
+            strength = self.outgoingEdges[(idEntityTo, idEdgeType, idEdge)]
             weightStrength = weight*strength
             if weightStrength>threshold:
-                pathsTo = graph[idEntityTo].createPathsDown(distance-1, graph,
-                                                            weightStrength,
-                                                            threshold)
-                for path in pathsTo:
-                    path.prependNode(self.idEntity, weight, idEdgeType,
-                                     strength)
-                    if path.originEntity!=path.terminalEntity:
-                        paths.append(path)
+                if idEntityTo in graph:
+                    pathsTo = graph[idEntityTo].createPathsDown(distance-1, graph,
+                                                                weightStrength,
+                                                                threshold)
+                    for path in pathsTo:
+                        path.prependNode(self.idEntity, weight, idEdgeType,
+                                         strength, idEdge)
+                        if path.originEntity!=path.terminalEntity:
+                            paths.append(path)
         
         return paths
 
@@ -179,6 +183,27 @@ class Node():
                 if not path.terminalEntity in self.reachableDown:
                     self.reachableDown[path.terminalEntity] = []
                 self.reachableDown[path.terminalEntity].append(copy.copy(path))
+    
+    def getPrevalence(self, idPopulation=None):
+        DISEASE=self.id_dict["Disease"]
+        GROUPOFDISEASES=self.id_dict["GroupOfDiseases"]
+        PATHOGEN=self.id_dict["Pathogen"]
+        if self.idEntityType!=DISEASE and \
+           self.idEntityType!=GROUPOFDISEASES and \
+           self.idEntityType!=PATHOGEN:
+           return 0.0
+        if idPopulation is None:
+            idPopulation = self.id_dict['Población general']
+        PREVALENCE_DISEASE = self.id_dict['The prevalence of this Disease in this Population is ...']
+        PREVALENCE_GROUP = self.id_dict['The prevalence of this Group in this Population is ...']
+        PREVALENCE_PATHOGEN = self.id_dict['The probability of observing this Pathogen in this Population is ...']
+        for (idEntityTo, idEdgeType, idEdge) in self.outgoingEdges:
+            if idEntityTo==idPopulation:
+                if self.idEntityType==DISEASE and idEdgeType==PREVALENCE_DISEASE or \
+                   self.idEntityType==GROUPOFDISEASES and idEdgeType==PREVALENCE_GROUP or \
+                   self.idEntityType==PATHOGEN and idEdgeType==PREVALENCE_PATHOGEN:
+                    return self.outgoingEdges[(idEntityTo, idEdgeType, idEdge)]
+        return 0.0
 
 class Path():
     def __init__(self, idEntity=None, weight=1):
@@ -190,15 +215,15 @@ class Path():
             self.addTerminalNode(idEntity, weight)
     
     def addTerminalNode(self, idEntity, weight):
-        self.path.append((weight, None, None, None))
+        self.path.append((weight, None, None, None, None))
         self.terminalEntity = idEntity
 
-    def prependNode(self, idEntity, weight, idEdgeType, edgeStrength):
-        self.path.insert(0,(weight, self.originEntity, idEdgeType, edgeStrength))
+    def prependNode(self, idEntity, weight, idEdgeType, edgeStrength, idEdge):
+        self.path.insert(0,(weight, self.originEntity, idEdgeType, edgeStrength, idEdge))
         self.originEntity = idEntity
     
-    def appendNode(self, idEntity, weight, idEdgeType, edgeStrength):
-        self.path.append((weight, idEntity, idEdgeType, edgeStrength))
+    def appendNode(self, idEntity, weight, idEdgeType, edgeStrength, idEdge):
+        self.path.append((weight, idEntity, idEdgeType, edgeStrength, idEdge))
         self.terminalEntity = idEntity
     
     def getLastWeight(self):
@@ -206,14 +231,27 @@ class Path():
             return None, 0.0
         else:
             return self.terminalEntity, self.path[-1][0]
+        
+    def getFirstComment(self, edge_dict):
+        if len(self.path)==0:
+            return None
+        else:
+            _, _, _, _, idEdge = self.path[0]
+            if idEdge is None:
+                return None
+            comment = edge_dict[idEdge][4]
+            if isinstance(comment,str):
+                return comment
+            else:
+                return ""
     
     def __str__(self):
         retval = "%d --> %d: [%d"%(self.originEntity, self.terminalEntity,
                                    self.originEntity)
-        for weight, idEntity, idEdgeType, edgeStrength in self.path:
+        for weight, idEntity, idEdgeType, edgeStrength, idEdge in self.path:
             retval += " (w=%f)"%weight
             if idEntity is not None:
-                retval+=" --(%d,%f)--> %d"%(idEdgeType, edgeStrength, idEntity)
+                retval+=" --(%d,%f,%d)--> %d"%(idEdgeType, edgeStrength, idEdge, idEntity)
         retval+="]"
         return retval
 
@@ -226,33 +264,38 @@ class Path():
                                                   self.terminalEntity,
                                                   strOrigin,
                                                   self.originEntity)
-        for weight, idEntity, idEdgeType, edgeStrength in self.path:
+        for weight, idEntity, idEdgeType, edgeStrength, idEdge in self.path:
             retval += " (w=%f)"%weight
             if idEntity is not None:
-                retval+=" --(%s (%d),%f)--> %s (%d)"%\
+                retval+=" --(%s (%d),%f,%d)--> %s (%d)"%\
                     (edge_type_dict[idEdgeType][3], idEdgeType,
-                     edgeStrength, entity_dict[idEntity][0], idEntity)
+                     edgeStrength, idEdge, entity_dict[idEntity][0], idEntity)
         retval+="]"
         return retval
     
     def getEdgeTypes(self):
         edgeTypes = []
-        for _, _, idEdgeType, _ in self.path:
+        for _, _, idEdgeType, _, _ in self.path:
             if idEdgeType is not None:
                 edgeTypes.append(idEdgeType)
         return edgeTypes
           
 
 class Graph():
-    def __init__(self, entity_dict, entity_type_dict, edge_dict, id_dict):
+    def __init__(self, entity_dict, entity_type_dict,
+                 edge_dict, edge_type_dict):
+        self.entity_dict = entity_dict
+        self.entity_type_dict = entity_type_dict
+        self.edge_dict = edge_dict
+        self.edge_type_dict = edge_type_dict
         self.graph = {}
-        self.id_dict = id_dict
         self.node_max = 0
-        
+        self.define_labels()
+
         # Create all nodes
         for idEntity in entity_dict:
             self.graph[idEntity]=Node(idEntity, entity_dict[idEntity][1], 
-                                      entity_dict[idEntity][0], id_dict)
+                                      entity_dict[idEntity][0], self.id_dict)
             self.node_max = max(self.node_max, idEntity)
         
         # Create all edges
@@ -263,11 +306,37 @@ class Graph():
             idEdgeType = edge[2]
             strength = edge[5]
             
-            self.graph[idEntityFrom].addOutgoingEdge(idEntityTo, idEdgeType,
-                                                     strength)
-            self.graph[idEntityTo].addIncomingEdge(idEntityFrom, idEdgeType,
-                                                   strength)
+            if idEntityFrom in self.graph:
+                self.graph[idEntityFrom].addOutgoingEdge(idEntityTo, idEdgeType,
+                                                         strength, idEdge)
+            if idEntityTo in self.graph:
+                self.graph[idEntityTo].addIncomingEdge(idEntityFrom, idEdgeType,
+                                                       strength, idEdge)
+        # Get prevalences in the general population
+        self.getPrevalences()
     
+    def define_labels(self):
+        self.id_dict = {}
+        # Add all entity types
+        for idEntityType in self.entity_type_dict:
+            name, _, _ = self.entity_type_dict[idEntityType]
+            self.id_dict[name]=idEntityType
+        
+        # Add all edge types
+        for idEdgeType in self.edge_type_dict:
+            edgeType = self.edge_type_dict[idEdgeType]
+            edgeName = edgeType[3]
+            self.id_dict[edgeName]=idEdgeType
+        
+        # Add specific entities
+        def find_entity(entityName):
+            for idEntity in self.entity_dict:
+                name, _, _, _, _ = self.entity_dict[idEntity]
+                if name==entityName:
+                    self.id_dict[name]=idEntity
+                    break
+        find_entity("Población general")
+
     def createPaths(self, distance=2, threshold=0.25):
         for idEntity in self.graph:
             self.graph[idEntity].createPaths(distance, self.graph, threshold)
@@ -286,13 +355,149 @@ class Graph():
             return self.graph[idEntity]
         else:
             return None
+    
+    def getNodeType(self, idEntity):
+        if idEntity in self.graph:
+            _, nodeType, _, _, _ = self.entity_dict[idEntity]
+            return nodeType
+        else:
+            return None        
 
-class COpenMedReasoner():
-    def newFacts(idEntities):
-        """ idEntities is a string "id1 id2 id3".
-            ids may be negative, and then present is not needed
-        """
-        pass
+    def getNodePrevalence(self, idEntity, default=0.0):
+        if idEntity in self.graph:
+            prevalence = self.prevalence_dict[idEntity]
+            if prevalence == 0.0:
+                prevalence = default
+            return prevalence
+        else:
+            return default
+    
+    def getPrevalences(self):
+        self.prevalence_dict={}
+        for idEntity in self.graph:
+            self.prevalence_dict[idEntity] = self.graph[idEntity].getPrevalence()
+        p=np.asarray([x for x in self.prevalence_dict.values()],dtype=np.float64)
+        self.avgPrevalence = math.exp(np.mean(np.log(p[p>0])))
+
+class COpenMedAlgorithm():
+    def __init__(self, fnLog, debug=False):
+        self.debug = debug
+        if debug:
+            self.fhLog=codecs.open(fnLog, 'w', encoding='utf8')
+        else:
+            self.fhLog=None
+
+    def __del__(self):
+        if self.debug:
+            self.fhLog.close()
+    
+    def constructGraph(self, fnPickle, distance=2, threshold=0.25):
+        _, _, self.entity_type_dict, self.entity_type_dict_info, \
+           self.entity_dict, self.entity_dict_info, \
+           self.edge_type_dict, self.edge_type_dict_info, \
+           list_bidirectional_relations, \
+           self.edge_dict, self.edge_dict_info, _, _, _, _ = \
+               load_database(fnPickle)
+        self.entities = separate_entities_by_type(self.entity_type_dict, 
+                                                  self.entity_dict)
+        add_directional_edges(self.edge_dict, list_bidirectional_relations)
+        
+        self.graph = Graph(self.entity_dict, self.entity_type_dict, 
+                           self.edge_dict, self.edge_type_dict)
+        self.graph.createPaths(distance, threshold)
+    
+    def propagateDown(self, weight, scoreIn, tol=1e-4):
+        scoreOut=np.zeros(scoreIn.shape[0])
+        for idEntity in range(scoreIn.shape[0]):
+            x = scoreIn[idEntity]
+            if abs(x)<tol:
+                continue
+            node = self.graph.getNode(idEntity)
+            if self.debug:
+                self.fhLog.write("\nSpreading %s(%d) scoreIn=%f\n\n"%(node.entityName,
+                                                                      idEntity, x))
+    
+            # For all outgoing edges
+            for idEntityTo in node.reachableDown:
+                toSum = 0.0
+                for path in node.reachableDown[idEntityTo]:
+                    xInter=x
+                    for iPath in range(len(path.path)):
+                        _, idEntityToInter, idEdgeType, edgeStrength, _ = path.path[iPath]
+                        if idEdgeType is None: # Terminal node
+                            break
+                        if not idEdgeType in weight: # The relation cannot be processed by this weight
+                            xInter=0
+                            break
+                        weightRow = weight[idEdgeType]
+                        if xInter>0:
+                            wDown = weightRow[0]
+                        else:
+                            wDown = weightRow[1]
+                        xInter=abs(xInter)*wDown*edgeStrength
+                    if abs(xInter)>abs(toSum):
+                        toSum=xInter
+                        if self.debug:
+                            self.fhLog.write(path.pretty(self.entity_dict,
+                                                         self.edge_type_dict))
+                            self.fhLog.write("Updating %s (%d) with %f\n"%\
+                                  (self.graph.getNode(idEntityTo).entityName,
+                                   idEntityTo, xInter))
+                if abs(toSum)>0:
+                    scoreOut[idEntityTo]+=toSum
+                    if self.debug:
+                        self.fhLog.write("\nNew score %s (%d)= %f\n"%\
+                              (self.graph.getNode(idEntityTo).entityName,
+                               idEntityTo, scoreOut[idEntityTo]))
+        return scoreOut
+
+    def propagateUp(self, weight, scoreIn, tol=1e-4):
+        scoreOut=np.zeros(scoreIn.shape[0])
+        for idEntity in range(scoreIn.shape[0]):
+            x = scoreIn[idEntity]
+            if abs(x)<tol:
+                continue
+            node = self.graph.getNode(idEntity)
+            if self.debug:
+                self.fhLog.write("\nSpreading %s(%d) scoreIn=%f\n\n"%(node.entityName,
+                                                                      idEntity, x))
+
+            # For all incoming edges
+            for idEntityFrom in node.reachableUp:
+                toSum = 0.0
+                for path in node.reachableUp[idEntityFrom]:
+                    xInter=x
+                    for iPath in reversed(range(len(path.path)-1)):
+                        _, idEntityFromInter, idEdgeType, edgeStrength, _ = path.path[iPath]
+                        if not idEdgeType in weight: # The relation cannot be processed by this weight
+                            xInter=0
+                            break
+                        weightRow = weight[idEdgeType]
+                        if xInter>0:
+                            wUp = weightRow[2]
+                        else:
+                            wUp = weightRow[3]
+                        xInter=abs(xInter)*wUp*edgeStrength
+                    if abs(xInter)>abs(toSum):
+                        toSum=xInter
+                        if self.debug:
+                            self.fhLog.write(path.pretty(self.entity_dict,
+                                                         self.edge_type_dict))
+                            self.fhLog.write("Updating %s (%d) with %f\n"%\
+                                  (self.graph.getNode(idEntityFrom).entityName,
+                                   idEntityFrom, xInter))
+    
+                if abs(toSum)>0:
+                    scoreOut[idEntityFrom]+=toSum
+                    if self.debug:
+                        self.fhLog.write("\nNew score %s (%d)= %f\n"%\
+                              (self.graph.getNode(idEntityFrom).entityName,
+                               idEntityFrom, scoreOut[idEntityFrom]))
+        return scoreOut
+
+    def propagate(self, weight, scoreIn, tol=1e-4):
+        return self.propagateDown(weight, scoreIn, tol)+\
+               self.propagateUp(weight, scoreIn, tol)
 
 if __name__=="__main__":
     if len(sys.argv) <= 1:
