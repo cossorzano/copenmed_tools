@@ -331,7 +331,7 @@ class Graph():
         # Add specific entities
         def find_entity(entityName):
             for idEntity in self.entity_dict:
-                name, _, _, _, _ = self.entity_dict[idEntity]
+                name, _, _, _ = self.entity_dict[idEntity]
                 if name==entityName:
                     self.id_dict[name]=idEntity
                     break
@@ -358,7 +358,7 @@ class Graph():
     
     def getNodeType(self, idEntity):
         if idEntity in self.graph:
-            _, nodeType, _, _, _ = self.entity_dict[idEntity]
+            _, nodeType, _, _ = self.entity_dict[idEntity]
             return nodeType
         else:
             return None        
