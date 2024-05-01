@@ -205,7 +205,10 @@ class Checker():
                          441, # Symptom is related to Function
                          445, # Symptom is never observed in Group
                          456, # Group is similar to Disease
+<<<<<<< HEAD
                          464, # Substance should be avoided if Group is present
+=======
+>>>>>>> c79b8ea472b68ecb4fb2b58da2699dc3ca20083d
                          467, # Group is caused by malfunction of Anatomy
                          468, # Group is related to Substance
                          471, # Group has standard Code
@@ -227,7 +230,10 @@ class Checker():
                          539, # CellType is involved in Disease
                          541, # Substance is related to CellType
                          543, # Anatomy is related to CellType
+<<<<<<< HEAD
                          549, # Group may cause Activity
+=======
+>>>>>>> c79b8ea472b68ecb4fb2b58da2699dc3ca20083d
                          ]
         nonRedundant2 = [4,   # Anatomy1 is related to Anatomy2
                          6,   # Treatment1 enhances the effect of Treatment2
@@ -445,12 +451,15 @@ class Checker():
                      (209,  # Treatment prevents Disease
                       5,    # Treatment belongs to the GroupOfTreatments
                       206), # Group may cause Disease
+<<<<<<< HEAD
                      (241,  # Group of treatments may cause Group of diseases
                       206,  # Group may cause Disease
                       77),  # Disease belongs to Group
                      (241,  # Group of treatments may cause Group of diseases
                       442,  # GroupOfTreartments should be avoided with GroupOfDiseases
                       76),  # Group1 is a subgroup of Group2
+=======
+>>>>>>> c79b8ea472b68ecb4fb2b58da2699dc3ca20083d
                      (269,  # Pathogen is more observed in Population
                       56,   # Pathogen causes disease
                       126), # Disease is more observed in Population
@@ -912,6 +921,7 @@ class Checker():
                     Ncount+=1
         print(toPrint)
         print("Numero de data:image: %d"%Ncount)
+<<<<<<< HEAD
             
     def checkHighlightedText(self):
         Ncount=0
@@ -1060,10 +1070,145 @@ class Checker():
                     out_dict[idEntityTo]+=1
                     out_dict_edgeTypes[idEntityTo]+=[idEdgeType]
             
+=======
+            
+    def checkHighlightedText(self):
+        Ncount=0
+        print("Analisis de highlighted text =============================")
+        for idEntity in self.resources_dict:
+            resources=self.resources_dict[idEntity]
+            for idResource, url in resources.URL.iteritems():
+                if "#:~:text" in url:
+                    idx=url.index("#:~:text")
+                    cleanUrl=url[0:idx]
+                    sql = "UPDATE recurso SET URL='%s' WHERE IdEntidad=%d and URL LIKE '%%%s%%';"%\
+                          (cleanUrl, idEntity, url)
+                    print(sql)
+                    Ncount+=1
+        print("Numero de highlighted text: %d"%Ncount)
+    
+    def checkRelationsToPoblacionGeneral(self):
+        POP_GENERAL = 641 # Poblacion general
+        PREVALENCE_DISEASE = 321
+        PREVALENCE_GROUP = 322
+        PROBABILITY = 323
+        IS_SUBGROUP = 200
+        Ncount=0
+        
+        whiteList = [47, 499, 1127, 1661, 2002, 3629, 3681, 7796, 10086]
+        
+        print("Analisis de relaciones con poblacion general =============================")
+        nodeGeneral = self.graph.getNode(POP_GENERAL)
+        for idEntityTo, idEdgeType, idEdge in nodeGeneral.outgoingEdges:
+            print("Poblacion general (641) -> %s (%d)"%(
+                                             self.entity_dict[idEntityTo][0],
+                                             idEntityTo))
+        for idEntityFrom, idEdgeType, idEdge in nodeGeneral.incomingEdges:
+            ok = idEdgeType==PREVALENCE_DISEASE or idEdgeType==PREVALENCE_GROUP or \
+                 idEdgeType==PROBABILITY
+            if idEdgeType==IS_SUBGROUP:
+                ok = ok or (self.entity_dict[idEntityFrom][2]=="Population")
+            ok = ok or idEntityFrom in whiteList
+            if not ok:
+                print("%s (%d)"%(self.entity_dict[idEntityFrom][0],
+                                 idEntityFrom))
+                Ncount+=1
+        print("Numero de relaciones incorrectas con poblacion general: %d"%Ncount)
+    
+    def checkHighPrevalences(self):
+        PREVALENCE_DISEASE = 321
+        PREVALENCE_GROUP = 322
+        Ncount=0
+        
+        whiteList = [ (2158, 435), (18, 641), (125, 5441), (268, 641),
+            (3038, 1707), (3043, 3647), (3039, 4407), (341, 641), (3314, 641),
+            (2019, 641), (2064, 1725), (401, 641), (3606, 641), (3614, 641),
+            (3627, 641), (2155, 435), (3696, 641), (2575, 641), (3708, 641),
+            (3718, 641), (3721, 641), (3730, 641), (2165, 435), (2580, 641),
+            (2582, 641), (192, 3587), (192, 1707), (184, 7602), (184, 1483),
+            (2335, 641), (1060, 5477), (2342, 1901), (345, 5637), (3938, 641),
+            (671, 1725), (4021, 641), (4109, 5637), (4122, 641), (4146, 641),
+            (701, 5299), (4166, 641), (1103, 1483), (4257, 641), (895, 3842),
+            (895, 641), (1183, 434), (4830, 2184), (4857, 1483), (4492, 641),
+            (5524, 1483), (2775, 641), (1193, 641), (1712, 8791), (1805, 3246),
+            (1880, 641), (1927, 3246), (1928, 435), (1945, 1483), (1991, 434),
+            (5842, 641), (1912, 439), (1912, 5298), (252, 641), (184, 641),
+            (184, 4099), (1880, 1901), (500, 3519), (500, 3647), (500, 641),
+            (512, 1707), (770, 641), (959, 641), (1785, 641), (1913, 641),
+            (1964, 641), (1971, 641), (2598, 641), (1374, 641), (2615, 641),
+            (2617, 641), (1785, 1707), (2756, 641), (2773, 641), (2793, 641),
+            (533, 641), (1448, 641), (7041, 10222), (5244, 641), (5275, 10331),
+            (5402, 10352), (2591, 641), (116, 641), (6096, 641), (10163, 1073),
+            (7199, 641), (6553, 641), (6801, 641), (7234, 641), (1060, 1820),
+            (1060, 10579), (8883, 641), (8904, 641), (8992, 435), (9204, 641),
+            (8252, 435), (10161, 3273), (8970, 641), (10304, 10321),
+            (9802, 3988), (10285, 641), (663, 641), (9260, 641), (7539, 641),
+            (7249, 641), (8591, 641), (7358, 641), (10269, 435), (10269, 3521),
+            (774, 641), (3320, 10322), (9802, 641), (9920, 641), (5349, 641),
+            (6124, 641), (10685, 641), (10229, 641), (10891, 641),
+            (10751, 641), (10756, 641), (11257, 641), (11271, 641),
+            (10373, 641), (4381, 1901), (4381, 3246), (6436, 3246),
+            (6436, 1901), (11374, 641), (11404, 641), (11413, 5615),
+            (11579, 3273), (11638, 641), (11931, 641), (12025, 641),
+            (12166, 641), (345, 641), (5137, 641), (111, 641), (125, 641),
+            (251, 641), (188, 641), (2155, 641), (1991, 641), (1928, 641),
+            (838, 641), (2342, 641), (1103, 435), (1103, 4099), (1042, 10363),
+            (1805, 641), (1805, 3109), (523, 641), (773, 641), (8252, 2184),
+            (11289, 641), (10161, 641), (9213, 1707), (13576, 641),
+            (13772, 641), (11934, 641), (12028, 641), (14002, 641),
+            (14002, 7603), (12100, 641), (14221, 641), (14221, 3982),
+            (12514, 641), (13019, 641), (14490, 3998), (13536, 641),
+            (13567, 641), (13454, 641), (13987, 641), (13989, 641),
+            (13985, 641), (13990, 641), (13991, 641), (13995, 641),
+            (610, 14908), (14561, 641), (13986, 641), (14192, 641),
+            (13932, 641), (14557, 641), (13656, 641)
+            ]
+        
+        print("Analisis de prevalencias muy altas =============================")
+        for idEdge in self.edge_dict:
+            idEntityFrom, idEntityTo, idEdgeType, edgeName, _, force = \
+                self.edge_dict[idEdge]
+            if (idEdgeType==PREVALENCE_DISEASE or idEdgeType==PREVALENCE_GROUP) and \
+                force>0.1:
+                if (idEntityFrom, idEntityTo) not in whiteList:
+                    print("%s (%d) -> %s (%d): Prevalencia: %f"%\
+                          (self.entity_dict[idEntityFrom][0], idEntityFrom,
+                           self.entity_dict[idEntityTo][0], idEntityTo,
+                           force))
+                    Ncount+=1
+        print("Numero de prevalencias muy altas: %d"%Ncount)
+    
+    def checkMultipleRelationships(self):
+        Ncount=0
+        whiteList=[
+            (95, # Activity may cause Group
+             338) # Activity should be avoided with this Group
+            ]
+        print("Analisis de multiples relaciones ==========================")
+        for idEntity in range(self.graph.getNodeMax()):
+            node = self.graph.getNode(idEntity)
+            if node is None:
+                continue
+    
+            # For all outgoing edges
+            out_dict={}
+            out_dict_edgeTypes={}
+            for idEntityTo, idEdgeType, idEdge in node.outgoingEdges:
+                if not idEntityTo in self.entity_dict:
+                    continue
+                if idEntityTo not in out_dict:
+                    out_dict[idEntityTo]=1
+                    out_dict_edgeTypes[idEntityTo]=[idEdgeType]
+                else:
+                    out_dict[idEntityTo]+=1
+                    out_dict_edgeTypes[idEntityTo]+=[idEdgeType]
+            
+>>>>>>> c79b8ea472b68ecb4fb2b58da2699dc3ca20083d
             # Check multiplicity
             for idEntityTo in out_dict:
                 if out_dict[idEntityTo]>1:
                     out_dict_edgeTypes[idEntityTo].sort()
+<<<<<<< HEAD
                     print("%s (%d) -> %s (%d) Num.Relaciones=%d (%s)"%\
                           (self.entity_dict[idEntity][0], idEntity,
                            self.entity_dict[idEntityTo][0], idEntityTo,
@@ -1101,6 +1246,17 @@ class Checker():
         print("Numero de entidades sin ingles: %d"%Ncount)
 
 
+=======
+                    if not out_dict_edgeTypes[idEntityTo] in whiteList:
+                        print("%s (%d) -> %s (%d) Num.Relaciones=%d (%s)"%\
+                              (self.entity_dict[idEntity][0], idEntity,
+                               self.entity_dict[idEntityTo][0], idEntityTo,
+                               out_dict[idEntityTo], 
+                               str(out_dict_edgeTypes[idEntityTo])))
+                        Ncount+=1
+        print("Numero de relaciones multiples=%d"%Ncount)
+
+>>>>>>> c79b8ea472b68ecb4fb2b58da2699dc3ca20083d
 if __name__=="__main__":                                
     checker = Checker()
     checker.checkRedundancy()
@@ -1115,6 +1271,10 @@ if __name__=="__main__":
     checker.checkRelationsToPoblacionGeneral()
     checker.checkHighPrevalences()
     checker.checkMultipleRelationships()
+<<<<<<< HEAD
     checker.checkEnglish()
     
 
+=======
+    
+>>>>>>> c79b8ea472b68ecb4fb2b58da2699dc3ca20083d
