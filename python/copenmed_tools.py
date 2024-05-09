@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import codecs
 import copy
 import os
@@ -1066,5 +1065,5 @@ if __name__=="__main__":
         	   resources_dict, resources_dict_info)
         pickle.dump(obj,outfile)
         outfile.close()
->>>>>>> c79b8ea472b68ecb4fb2b58da2699dc3ca20083d
+
         
