@@ -3,6 +3,10 @@
 Created on Thu May  2 10:54:27 2024
 
 @author: coss
+
+Secuencia: valida_links
+           extract_text
+
 """
 import fitz # pip install PyMuPDF
 import glob
@@ -34,9 +38,7 @@ def splitSentences(text):
     for stopWord in stopWords:
         fixed_text = fixed_text.replace(stopWord,' ')
 
-    # Split by end of line or .
-#    sentenceList = [sentence.strip() for sentence in 
-#                    re.split(r'\n|\.', fixed_text)]
+    # Split by .
     sentenceList = [sentence.strip() for sentence in 
                     fixed_text.split('.')]
 
@@ -73,7 +75,9 @@ def cleanSentences(sentenceList):
                  'vademecum', 'spain', 'aemps', 'fda', 'publicidad',
                  'descarga', 'download', 'gratis', 'aceptado', 'revisado',
                  'mayo clinic', 'textbook', 'chile', 'fax', 'pide cita',
-                 'cedidos', 'lucro', 'aviso'
+                 'cedidos', 'lucro', 'aviso', 'contact us', 
+                 'contacte con nosotros', 'ánimo de lucro', 'este aviso',
+                 'pediamecum', 'muchas gracias', 'commercial'
                  ]
     for sentence in sentenceList:
         ok=True
@@ -127,28 +131,31 @@ if __name__=="__main__":
         model_kwargs=model_kwargs,
         encode_kwargs=encode_kwargs)
     for idURL in glob.glob(os.path.join('data','recursos','*')):
-        fnText=os.path.join(idURL,'content.txt')
-        sentenceList = []
-        if not os.path.exists(fnText):
-            fnHTML=os.path.join(idURL,'content.html')
-            fnPDF=os.path.join(idURL,'content.pdf')
-            if os.path.exists(fnHTML):
-                text=readHTML(fnHTML)
-            elif os.path.exists(fnPDF):
-                text=readPDF(fnPDF)
-            print("Processing %s"%idURL)
-            if text:
-                sentenceList=cleanSentences(splitSentences(text))
-                with open(fnText,'w',encoding = 'utf-8') as fh:
-                    fh.write('.\n'.join(sentenceList))
-                    fh.close()
-        
-        fnEmbedding=os.path.join(idURL,'content.npy')
-        if not os.path.exists(fnEmbedding):
-            print("Embedding %s"%idURL)
-            if len(sentenceList)==0:
-                with open(fnText, 'r', encoding = 'utf-8') as fh:
-                    sentenceList = fh.readlines()
-                    sentenceList=[sentence.strip() for sentence in sentenceList]
-            embedding = np.array(hf.embed_documents(sentenceList))
-            embedding.tofile(fnEmbedding)
+        try:
+            fnText=os.path.join(idURL,'content.txt')
+            sentenceList = []
+            if not os.path.exists(fnText):
+                fnHTML=os.path.join(idURL,'content.html')
+                fnPDF=os.path.join(idURL,'content.pdf')
+                if os.path.exists(fnHTML):
+                    text=readHTML(fnHTML)
+                elif os.path.exists(fnPDF):
+                    text=readPDF(fnPDF)
+                print("Processing %s"%idURL)
+                if text:
+                    sentenceList=cleanSentences(splitSentences(text))
+                    with open(fnText,'w',encoding = 'utf-8') as fh:
+                        fh.write('.\n'.join(sentenceList))
+                        fh.close()
+            
+            fnEmbedding=os.path.join(idURL,'content.npy')
+            if not os.path.exists(fnEmbedding):
+                print("Embedding %s"%idURL)
+                if len(sentenceList)==0:
+                    with open(fnText, 'r', encoding = 'utf-8') as fh:
+                        sentenceList = fh.readlines()
+                        sentenceList=[sentence.strip() for sentence in sentenceList]
+                embedding = np.array(hf.embed_documents(sentenceList))
+                np.save(fnEmbedding, embedding)
+        except FileNotFoundError:
+            continue

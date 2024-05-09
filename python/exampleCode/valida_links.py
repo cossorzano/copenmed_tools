@@ -8,6 +8,11 @@ import glob
 import codecs
 import chardet
 
+"""
+Secuencia: valida_links
+           extract_text
+"""
+
 def make_request(url):
     userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.82 Safari/537.36"
     try:
@@ -94,6 +99,8 @@ if __name__=="__main__":
 
     df_sheet_index = read_excel(fnExcel, sheet_name="recursos")
     today = date.today()
+    
+    blackList= ['https://www.rileychildrens.org/health-info/bone-and-joint-infections']
             
     Nerrors=0
     Nwebs=0
@@ -110,9 +117,12 @@ if __name__=="__main__":
             correct, lastCheck=validatedLinks[link]
             timeDiff = lastCheck-today
             if correct and timeDiff.days<240:
+#            if timeDiff.days<240:
                 okToCheck=False
             if verbose:
                 print("It is already in validated", timeDiff)
+        if link in blackList:
+            continue
         if verbose:
             print("okToCheck=",okToCheck)
         if okToCheck:
